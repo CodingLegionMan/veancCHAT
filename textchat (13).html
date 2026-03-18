@@ -12,7 +12,6 @@
     <style>
         /* --- THEME ENGINE --- */
         :root {
-            /* Hacker Theme (Default) */
             --bg: #0a0a0a; --panel: #111; --border: #00ff41; --text: #fff; 
             --accent: #00ff41; --danger: #ff4444; --sys-log: #555; --font-size: 16px;
         }
@@ -27,7 +26,6 @@
             --accent: #ffff00; --danger: #ff0000; --sys-log: #aaaaaa;
         }
 
-        /* NEW THEMES */
         [data-theme="light"] {
             --bg: #f4f4f9; --panel: #ffffff; --border: #cccccc; --text: #333333; 
             --accent: #0055ff; --danger: #d90000; --sys-log: #777777;
@@ -43,7 +41,6 @@
             --accent: #00ffff; --danger: #ff3366; --sys-log: #fdb927;
         }
 
-        /* ACCESSIBILITY TOGGLES */
         body.dyslexia-font * { font-family: 'Comic Sans MS', 'OpenDyslexic', 'Segoe UI', sans-serif !important; letter-spacing: 0.5px !important; }
         body.no-animations * { transition: none !important; scroll-behavior: auto !important; }
 
@@ -56,30 +53,26 @@
         .header h2 { color: var(--accent); margin: 0; letter-spacing: 1px; }
         .credits { font-size: 0.8rem; color: var(--text); opacity: 0.7; font-style: italic; }
 
-        /* Setup Screen */
         #setup-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 20px; z-index: 5; }
         .box { background: rgba(0,0,0,0.5); border: 1px solid var(--border); padding: 30px; border-radius: 8px; text-align: center; width: 100%; max-width: 400px; }
         
-        input[type="text"], input[type="range"] { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px; margin-bottom: 15px; border-radius: 4px; font-size: 1rem; outline: none; text-align: center; }
-        input[type="text"]:focus { box-shadow: 0 0 8px var(--accent); }
+        input[type="text"], input[type="range"], input[type="number"] { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px; margin-bottom: 15px; border-radius: 4px; font-size: 1rem; outline: none; text-align: center; }
+        input[type="text"]:focus, input[type="number"]:focus { box-shadow: 0 0 8px var(--accent); }
         input[type="range"] { padding: 0; cursor: pointer; accent-color: var(--accent); }
         
         button { background: var(--accent); color: var(--bg); border: none; padding: 12px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.2s; width: 100%; font-size: 1rem; margin-bottom: 10px; }
         button:hover, button:focus { filter: brightness(1.2); transform: translateY(-1px); }
         button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
 
-        /* Chat Screen */
         #chat-screen { display: none; flex: 1; flex-direction: column; position: relative; overflow: hidden; z-index: 5; }
         .top-bar { display: flex; justify-content: space-between; padding: 15px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); align-items: center; flex-wrap: wrap; gap: 10px; z-index: 10; }
         
         .pin-badge { background: var(--accent); color: var(--bg); padding: 5px 15px; font-family: monospace; font-size: 1.2rem; font-weight: bold; border-radius: 4px; cursor: pointer; letter-spacing: 2px; }
         .pin-badge:hover { background: var(--text); color: var(--bg); }
 
-        /* INJECTED: Pinned Messages */
         #pinned-msg-container { position: absolute; top: 0; left: 0; width: 100%; background: rgba(0, 0, 0, 0.85); border-bottom: 2px solid var(--accent); color: var(--text); padding: 12px 20px; z-index: 50; display: none; align-items: center; justify-content: space-between; font-size: 0.9rem; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         #pinned-msg-text { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-right: 15px; }
 
-        /* Mesh Drive Panel */
         #drive-panel { position: absolute; right: -350px; top: 0; width: 320px; height: 100%; background: rgba(0,0,0,0.95); border-left: 2px solid var(--accent); transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 80; display: flex; flex-direction: column; padding: 20px; box-shadow: -5px 0 25px rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
         #drive-panel.open { right: 0; }
         .drive-header { font-size: 1.2rem; font-weight: bold; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
@@ -87,6 +80,12 @@
         .drive-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; border: 1px dashed var(--sys-log); position: relative; }
         .drive-item img { max-width: 100%; border-radius: 4px; border: 1px solid var(--sys-log); }
         .drive-meta { font-size: 0.75rem; color: var(--sys-log); margin-top: 5px; font-style: italic; }
+
+        #god-mode-panel { display: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 400px; background: rgba(20, 0, 30, 0.95); border: 2px solid #9d00ff; border-radius: 8px; padding: 20px; z-index: 999; box-shadow: 0 0 40px rgba(157, 0, 255, 0.5); backdrop-filter: blur(10px); }
+        .god-header { color: #9d00ff; font-weight: bold; font-size: 1.3rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 2px; }
+        .god-input { width: 100%; background: #000; border: 1px solid #9d00ff; color: #fff; padding: 8px; margin-bottom: 10px; }
+        .god-btn { background: #9d00ff; color: #fff; border: none; padding: 8px 12px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
+        .god-btn:hover { filter: brightness(1.3); }
 
         .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative; scroll-behavior: smooth; min-height: 0; }
         .message { position: relative; max-width: 75%; padding: 12px 16px; background: rgba(0,0,0,0.4); border-radius: 8px; border-left: 4px solid var(--border); align-self: flex-start; line-height: 1.4; word-wrap: break-word; }
@@ -107,6 +106,18 @@
         .chat-file { display: inline-block; padding: 8px; background: rgba(0,0,0,0.5); border: 1px dashed var(--accent); margin-top: 8px; text-decoration: none; color: var(--accent); font-family: monospace; word-break: break-all; }
         code { background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 3px; font-family: monospace; color: var(--accent); }
 
+        /* INJECTED: GAMES UI */
+        .game-box { background: rgba(0,0,0,0.6); border: 1px solid var(--accent); padding: 15px; border-radius: 6px; margin-top: 10px; text-align: center; font-family: monospace; }
+        .game-title { color: var(--accent); font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; }
+        .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 150px; margin: 0 auto; }
+        .ttt-cell { height: 45px; background: var(--panel); border: 1px solid var(--border); color: var(--text); font-size: 1.2rem; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.1s; }
+        .ttt-cell:hover { background: var(--accent); color: var(--bg); }
+        .game-btn { background: var(--accent); color: var(--bg); border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; margin: 5px; transition: 0.2s; width: auto; display: inline-block; }
+        .game-btn:hover { filter: brightness(1.2); }
+        .game-input { background: var(--panel); border: 1px solid var(--accent); color: var(--text); padding: 8px; width: 80px; text-align: center; border-radius: 4px; display: inline-block; margin: 0; }
+        .game-bar { width: 100%; height: 20px; background: #222; border: 1px solid var(--sys-log); position: relative; margin-top: 10px; border-radius: 10px; overflow: hidden; }
+        .game-bar-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.1s; }
+
         #typingIndicator { font-size: 0.85em; color: var(--sys-log); font-style: italic; padding: 0 20px 5px 20px; height: 20px; display: flex; align-items: center; }
         #scrollAlert { position: absolute; bottom: 80px; right: 20px; background: var(--accent); color: var(--bg); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 10; display: none; }
 
@@ -114,11 +125,10 @@
         .input-area input[type="text"] { flex: 1; margin: 0; min-width: 200px; text-align: left; }
         .input-area button { width: auto; margin: 0; padding: 12px 20px; }
 
-        #emojiBoard { display: none; position: absolute; bottom: 70px; right: 120px; background: var(--panel); border: 1px solid var(--accent); border-radius: 8px; padding: 10px; width: 250px; grid-template-columns: repeat(6, 1fr); gap: 5px; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.8); max-height: 200px; overflow-y: auto; }
+        #emojiBoard { display: none; position: absolute; bottom: 70px; right: 170px; background: var(--panel); border: 1px solid var(--accent); border-radius: 8px; padding: 10px; width: 250px; grid-template-columns: repeat(6, 1fr); gap: 5px; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.8); max-height: 200px; overflow-y: auto; }
         .emoji-btn { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; padding: 5px; width: 100%; text-align: center; }
         .emoji-btn:hover { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
-        /* Modals & Media */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(3px); }
         .modal-content { background: var(--panel); border: 2px solid var(--accent); padding: 30px; border-radius: 8px; width: 90%; max-width: 450px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
         
@@ -135,7 +145,6 @@
         video { height: 150px; border: 1px solid var(--accent); border-radius: 4px; background: #111; }
         .hidden { display: none !important; }
         
-        /* Checkbox styling for accessibility options */
         .acc-toggle { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text); }
         .acc-toggle input { cursor: pointer; }
     </style>
@@ -174,6 +183,50 @@
 
         <button onclick="document.getElementById('settingsModal').style.display='none'" style="margin-top: 20px;">Close Settings</button>
     </div>
+</div>
+
+<div id="gamesModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 15px; color: var(--accent); text-align: center;">🎮 MESH GAME CENTER</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="secondary" onclick="launchGame('tictactoe')">⭕ Mesh-Tac-Toe</button>
+            <button class="secondary" onclick="launchGame('roulette')">🔫 Cyber Roulette</button>
+            <button class="secondary" onclick="launchGame('vault')">🔓 Vault Cracker (1-100)</button>
+            <button class="secondary" onclick="launchGame('reaction')">⚡ Reaction Hack</button>
+            <button class="secondary" onclick="launchGame('overload')">💥 Mesh Overload (Co-op)</button>
+        </div>
+        <button onclick="document.getElementById('gamesModal').style.display='none'" style="margin-top: 20px;">Close Center</button>
+    </div>
+</div>
+
+<div id="god-mode-panel">
+    <div class="god-header">
+        ⚡ TITAN GOD MODE
+        <button style="width:auto; padding:2px 8px; margin:0; background:transparent; color:#9d00ff; border:none;" onclick="document.getElementById('god-mode-panel').style.display='none'">✖</button>
+    </div>
+    
+    <input type="text" id="godSpoofName" class="god-input" placeholder="Spoof Target Name...">
+    <input type="text" id="godSpoofMsg" class="god-input" placeholder="Spoof Message...">
+    <button class="god-btn" onclick="execGodSpoof()">Send Spoofed Message</button>
+    
+    <div style="height:1px; background:#9d00ff; margin: 15px 0;"></div>
+    
+    <input type="text" id="godRenameOld" class="god-input" placeholder="Target's Current Name...">
+    <input type="text" id="godRenameNew" class="god-input" placeholder="Force New Name...">
+    <button class="god-btn" onclick="execGodRename()">Force Rename</button>
+    
+    <div style="height:1px; background:#9d00ff; margin: 15px 0;"></div>
+    
+    <input type="text" id="godGhostMsg" class="god-input" placeholder="System Ghost Message...">
+    <button class="god-btn" onclick="execGodGhost()">Send Ghost Broadcast</button>
+    
+    <div style="height:1px; background:#9d00ff; margin: 15px 0;"></div>
+    
+    <div style="display:flex; gap:10px;">
+        <button class="god-btn" onclick="execGodTheme()">Force Cyberpunk</button>
+        <button class="god-btn" onclick="execGodFlashbang()">Trigger Flashbang</button>
+    </div>
+    <button class="god-btn" style="background:var(--danger);" onclick="execGodWipe()">Total Mesh Wipe</button>
 </div>
 
 <div id="whiteboardModal" class="modal">
@@ -263,6 +316,7 @@
                 <input type="checkbox" id="burnerToggle"> 🔥 Burner
             </label>
             <input type="text" id="msgInput" placeholder="Type message or /w [Name]... (Paste files with Ctrl+V)" autocomplete="off">
+            <button class="secondary" onclick="document.getElementById('gamesModal').style.display='flex'" style="width: auto; padding: 12px 15px; margin:0; border-color: #00f0ff; color: #00f0ff;" title="Mini Games">🎮</button>
             <button class="secondary" onclick="toggleEmojiBoard()" style="width: auto; padding: 12px 15px; margin:0;">😀</button>
             <div id="emojiBoard"></div>
             <button onclick="sendMessage()">SEND</button>
@@ -281,7 +335,6 @@
             if(!this.ctx || masterVolume === 0) return;
             const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
             osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-            // Master Volume Applied Here!
             gain.gain.setValueAtTime(vol * masterVolume, this.ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
             osc.connect(gain); gain.connect(this.ctx.destination);
@@ -296,8 +349,8 @@
     function updateVolume() {
         masterVolume = parseFloat(document.getElementById('audioVolume').value);
         localStorage.setItem('veancVol', masterVolume);
-        AudioSynth.init(); // Init context if setting volume first
-        AudioSynth.pop(); // Give audio feedback
+        AudioSynth.init(); 
+        AudioSynth.pop(); 
     }
 
     // --- SYSTEM VARS ---
@@ -307,6 +360,7 @@
     let myAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23111'/><text x='50' y='65' font-size='50' font-family='monospace' fill='%2300ff41' text-anchor='middle'>_</text></svg>";
     let localMediaStream = null; 
     let activeCalls = []; 
+    let gameStates = {}; // INJECTED: Global Game State Tracker
 
     const chatBox = document.getElementById('chatBox');
     const msgInput = document.getElementById('msgInput');
@@ -317,7 +371,6 @@
         if (localStorage.getItem('veancTheme')) setTheme(localStorage.getItem('veancTheme'));
         if (localStorage.getItem('veancFontSize')) changeFontSize(parseInt(localStorage.getItem('veancFontSize')) - currentFontSize);
         
-        // Load Accessibility & Audio Settings
         if (localStorage.getItem('veancDyslexia') === 'true') { document.body.classList.add('dyslexia-font'); document.getElementById('dyslexiaToggle').checked = true; }
         if (localStorage.getItem('veancNoAnim') === 'true') { document.body.classList.add('no-animations'); document.getElementById('animationToggle').checked = true; }
         if (localStorage.getItem('veancVol') !== null) { 
@@ -369,6 +422,9 @@
             call.on('stream', stream => {
                 addVideoStream(stream, call.peer);
                 document.getElementById('hangupBtn').style.opacity = '1';
+                
+                document.getElementById('toggleCamBtn').style.opacity = '1';
+                document.getElementById('toggleMicBtn').style.opacity = '1';
             });
             call.on('close', () => {
                 const el = document.getElementById('vid_' + call.peer);
@@ -419,16 +475,53 @@
                 renderMessage(data.id, data.author, data.text, false, data.burn, data.avatar);
                 if (!document.hidden) broadcast({ type: 'seen', msgId: data.id, viewer: myUsername });
             }
-            // INJECTED: Whisper Listener
             else if (data.type === 'whisper') {
                 if (data.target === myUsername) {
                     renderMessage(data.id, data.author, `[Whisper]: ${data.text}`, false, false, data.avatar, true);
                 }
             }
+            // INJECTED: Game Sync Listeners
+            else if (data.type === 'game_start') {
+                gameStates[data.gameId] = data.state;
+                renderGameMessage(data.id, data.gameId, data.gameType, data.state, data.author, data.avatar, false);
+            }
+            else if (data.type === 'game_action') {
+                processGameAction(data.gameId, data.action, data.payload, data.author);
+            }
+            // God Mode Payload
+            else if (data.type === 'god_spoof') {
+                renderMessage(data.id, data.author, data.text, false, false, data.avatar);
+            }
+            else if (data.type === 'god_rename') {
+                if (myUsername === data.oldName) {
+                    myUsername = data.newName;
+                    renderSystem(`⚡ A higher power has renamed you to: ${myUsername}`);
+                }
+            }
+            else if (data.type === 'god_ghost') {
+                const div = document.createElement('div');
+                div.style.alignSelf = 'center'; div.style.color = 'var(--danger)'; div.style.fontSize = '0.9rem'; div.style.fontWeight = 'bold'; div.style.margin = '10px 0'; div.style.textShadow = '0 0 5px var(--danger)';
+                div.innerText = `[SYSTEM ALERT]: ${data.text}`; chatBox.appendChild(div); scrollToBottom();
+            }
+            else if (data.type === 'god_theme') {
+                setTheme(data.theme);
+                renderSystem(`⚡ A higher power forced your theme to: ${data.theme}`);
+            }
+            else if (data.type === 'god_flashbang') {
+                const oldVol = masterVolume; masterVolume = 1;
+                AudioSynth.chirp(); setTimeout(() => AudioSynth.pop(), 100); setTimeout(() => AudioSynth.ding(), 200);
+                const oldBg = document.body.style.background; document.body.style.background = "#ffffff";
+                setTimeout(() => { document.body.style.background = oldBg; masterVolume = oldVol; }, 500);
+                renderSystem("⚡ FLASHBANG TRIGGERED ⚡");
+            }
+            else if (data.type === 'god_wipe') {
+                chatBox.innerHTML = '';
+                renderSystem("⚡ THE MESH HAS BEEN PURGED BY A HIGHER POWER ⚡");
+            }
+
             else if (data.type === 'media') renderMedia(data.id, data.author, data.fileData, data.fileName, data.isImage, false, data.avatar);
             else if (data.type === 'reaction') addReactionToUI(data.id, data.emoji);
             else if (data.type === 'seen') updateSeenUI(data.msgId, data.viewer);
-            // INJECTED: Pin Listener
             else if (data.type === 'pin') displayPinnedMessage(data.text, data.author);
             else if (data.type === 'unpin') document.getElementById('pinned-msg-container').style.display = 'none';
             else if (data.type === 'typing') showTypingIndicator(data.author);
@@ -449,10 +542,186 @@
 
     document.addEventListener("visibilitychange", () => { if (!document.hidden) { unreadCount = 0; document.title = "veancCHAT V6 - TITAN MASTER"; } });
 
+
+    // --- INJECTED: INLINE MESH GAMES ENGINE ---
+    function getInitialGameState(type) {
+        if(type === 'tictactoe') return { board: ['','','','','','','','',''], turn: 'X', players: {}, winner: null };
+        if(type === 'roulette') return { bullet: Math.floor(Math.random() * 6), current: 0, dead: null };
+        if(type === 'vault') return { target: Math.floor(Math.random() * 100) + 1, guesses: 0, winner: null, hint: 'Guess a number (1-100)!' };
+        if(type === 'reaction') return { active: false, winner: null, startTime: Date.now() + 2000 + Math.random()*4000 };
+        if(type === 'overload') return { clicks: 0, max: 100, completed: false };
+    }
+
+    function launchGame(type) {
+        if (connections.length === 0 && !isHost) return renderSystem("Connect to a mesh to play games.");
+        const gameId = 'game_' + Math.random().toString(36).substr(2, 9);
+        const initialState = getInitialGameState(type);
+        gameStates[gameId] = initialState;
+        
+        const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
+        broadcast({ type: 'game_start', id: msgId, gameId: gameId, gameType: type, state: initialState, author: myUsername, avatar: myAvatar });
+        renderGameMessage(msgId, gameId, type, initialState, myUsername, myAvatar, true);
+        
+        document.getElementById('gamesModal').style.display='none';
+        AudioSynth.pop();
+    }
+
+    function renderGameMessage(msgId, gameId, type, state, author, avatarSrc, isMine) {
+        const div = document.createElement('div'); 
+        div.id = msgId; 
+        div.className = `message ${isMine ? 'mine' : ''}`;
+        
+        let html = `<div class="msg-header"><img src="${avatarSrc || myAvatar}" class="avatar"><span class="author">${author} started a game!</span></div>`;
+        html += `<div id="game_box_${gameId}" class="game-box">${buildGameHTML(gameId, type, state)}</div>`;
+        
+        div.innerHTML = html; 
+        chatBox.appendChild(div);
+        scrollToBottom();
+        if(!isMine) AudioSynth.ding();
+        
+        // Auto-Trigger Reaction Hack Timer if Host
+        if (type === 'reaction' && isMine) {
+            setTimeout(() => {
+                broadcast({ type: 'game_action', gameId: gameId, action: 'activate', payload: {} });
+                processGameAction(gameId, 'activate', {}, myUsername);
+            }, state.startTime - Date.now());
+        }
+    }
+
+    function buildGameHTML(gameId, type, state) {
+        if(type === 'tictactoe') {
+            if(state.winner) return `<div class="game-title">Mesh-Tac-Toe</div><div style="color:var(--accent)">${state.winner === 'Draw' ? 'Draw!' : state.winner + ' Wins!'}</div>`;
+            let grid = `<div class="ttt-grid">`;
+            state.board.forEach((cell, i) => { grid += `<button class="ttt-cell" onclick="sendGameAction('${gameId}', 'move', ${i})">${cell}</button>`; });
+            grid += `</div>`; return `<div class="game-title">Mesh-Tac-Toe</div>${grid}`;
+        }
+        if(type === 'roulette') {
+            if(state.dead) return `<div class="game-title">Cyber Roulette</div><div style="color:var(--danger)">💀 ${state.dead} got flatlined!</div>`;
+            return `<div class="game-title">Cyber Roulette</div><div style="margin-bottom:10px;">Chamber: ${state.current + 1}/6</div><button class="game-btn" onclick="sendGameAction('${gameId}', 'pull', null)">🔫 Pull Trigger</button>`;
+        }
+        if(type === 'vault') {
+            if(state.winner) return `<div class="game-title">Vault Cracker</div><div style="color:var(--accent)">🔓 ${state.winner} cracked it! (${state.target})</div>`;
+            return `<div class="game-title">Vault Cracker</div><div style="margin-bottom:10px;">${state.hint}</div><input type="number" id="vault_${gameId}" class="game-input" placeholder="#"><button class="game-btn" onclick="sendGameAction('${gameId}', 'guess', document.getElementById('vault_${gameId}').value)">Guess</button>`;
+        }
+        if(type === 'reaction') {
+            if(state.winner) return `<div class="game-title">Reaction Hack</div><div style="color:var(--accent)">⚡ ${state.winner} hacked it first!</div>`;
+            if(state.active) return `<div class="game-title">Reaction Hack</div><button class="game-btn" style="background:var(--danger); width:100%; height:50px; font-size:1.5rem;" onclick="sendGameAction('${gameId}', 'hack', null)">HACK NOW!</button>`;
+            return `<div class="game-title">Reaction Hack</div><div style="color:var(--sys-log)">Waiting for signal...</div>`;
+        }
+        if(type === 'overload') {
+            if(state.completed) return `<div class="game-title">Mesh Overload</div><div style="color:var(--accent)">💥 Mesh Successfully Overloaded!</div>`;
+            return `<div class="game-title">Mesh Overload</div><button class="game-btn" onclick="sendGameAction('${gameId}', 'click', null)">⚡ OVERCHARGE</button><div class="game-bar"><div class="game-bar-fill" style="width:${state.clicks}%"></div></div>`;
+        }
+    }
+
+    function sendGameAction(gameId, action, payload) {
+        broadcast({ type: 'game_action', gameId: gameId, action: action, payload: payload, author: myUsername });
+        processGameAction(gameId, action, payload, myUsername);
+    }
+
+    function processGameAction(gameId, action, payload, author) {
+        const state = gameStates[gameId];
+        if(!state) return;
+        
+        let type = '';
+        if(state.board !== undefined) type = 'tictactoe';
+        else if(state.bullet !== undefined) type = 'roulette';
+        else if(state.target !== undefined) type = 'vault';
+        else if(state.active !== undefined) type = 'reaction';
+        else if(state.clicks !== undefined) type = 'overload';
+
+        if(type === 'tictactoe' && action === 'move' && !state.winner && state.board[payload] === '') {
+            if(!state.players[author]) {
+                const pCount = Object.keys(state.players).length;
+                if(pCount === 0) state.players[author] = 'X';
+                else if(pCount === 1 && !state.players[author]) state.players[author] = 'O';
+            }
+            if(state.players[author] === state.turn) {
+                state.board[payload] = state.turn;
+                state.turn = state.turn === 'X' ? 'O' : 'X';
+                const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+                for(let w of wins) { if(state.board[w[0]] && state.board[w[0]]===state.board[w[1]] && state.board[w[1]]===state.board[w[2]]) state.winner = author; }
+                if(!state.winner && !state.board.includes('')) state.winner = 'Draw';
+                AudioSynth.pop();
+            }
+        }
+        else if(type === 'roulette' && action === 'pull' && !state.dead) {
+            if(state.current === state.bullet) {
+                state.dead = author; 
+                AudioSynth.playTone(150, 'sawtooth', 0.5, 0.2); // BANG
+                if(author === myUsername) { // Glitch screen locally for the loser
+                    document.body.style.filter = "invert(1) hue-rotate(180deg)";
+                    setTimeout(()=>document.body.style.filter = "none", 2000);
+                }
+            } else {
+                state.current++;
+                AudioSynth.pop();
+            }
+        }
+        else if(type === 'vault' && action === 'guess' && !state.winner) {
+            const num = parseInt(payload);
+            if(num === state.target) { state.winner = author; AudioSynth.ding(); AudioSynth.ding(); }
+            else if(num < state.target) state.hint = `Last: ${num} (Go Higher) - by ${author}`;
+            else state.hint = `Last: ${num} (Go Lower) - by ${author}`;
+            AudioSynth.pop();
+        }
+        else if(type === 'reaction') {
+            if(action === 'activate') { state.active = true; AudioSynth.chirp(); }
+            else if(action === 'hack' && state.active && !state.winner) { state.winner = author; AudioSynth.ding(); }
+        }
+        else if(type === 'overload' && action === 'click' && !state.completed) {
+            state.clicks++;
+            AudioSynth.playTone(300 + state.clicks*5, 'sine', 0.05, 0.05); // Pitch speeds up
+            if(state.clicks >= state.max) { state.completed = true; AudioSynth.ding(); AudioSynth.chirp(); }
+        }
+
+        const box = document.getElementById(`game_box_${gameId}`);
+        if(box) box.innerHTML = buildGameHTML(gameId, type, state);
+    }
+
+    // --- GOD MODE EXECUTORS ---
+    function execGodSpoof() {
+        const target = document.getElementById('godSpoofName').value.trim();
+        const msg = document.getElementById('godSpoofMsg').value.trim();
+        if(!target || !msg) return;
+        const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
+        broadcast({ type: 'god_spoof', id: msgId, author: target, text: msg, avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23111'/><text x='50' y='65' font-size='50' font-family='monospace' fill='%239d00ff' text-anchor='middle'>?</text></svg>" });
+        renderMessage(msgId, target, msg, false, false, null);
+        document.getElementById('godSpoofMsg').value = '';
+    }
+
+    function execGodRename() {
+        const oldName = document.getElementById('godRenameOld').value.trim();
+        const newName = document.getElementById('godRenameNew').value.trim();
+        if(!oldName || !newName) return;
+        broadcast({ type: 'god_rename', oldName: oldName, newName: newName });
+        renderSystem(`⚡ Sent Force Rename: ${oldName} -> ${newName}`);
+    }
+
+    function execGodGhost() {
+        const msg = document.getElementById('godGhostMsg').value.trim();
+        if(!msg) return;
+        broadcast({ type: 'god_ghost', text: msg });
+        const div = document.createElement('div');
+        div.style.alignSelf = 'center'; div.style.color = 'var(--danger)'; div.style.fontSize = '0.9rem'; div.style.fontWeight = 'bold'; div.style.margin = '10px 0'; div.style.textShadow = '0 0 5px var(--danger)';
+        div.innerText = `[SYSTEM ALERT]: ${msg}`; chatBox.appendChild(div); scrollToBottom();
+        document.getElementById('godGhostMsg').value = '';
+    }
+
+    function execGodTheme() { broadcast({ type: 'god_theme', theme: 'cyberpunk' }); renderSystem("⚡ Forced Cyberpunk Theme on Mesh"); }
+    function execGodFlashbang() { broadcast({ type: 'god_flashbang' }); renderSystem("⚡ Flashbang Deployed"); }
+    function execGodWipe() { broadcast({ type: 'god_wipe' }); chatBox.innerHTML = ''; renderSystem("⚡ THE MESH HAS BEEN PURGED ⚡"); }
+
     // --- MESSAGING & WHISPERS ---
     function sendMessage() {
         const text = msgInput.value.trim();
         if (!text) return;
+
+        if (text === '/titan ilovejamm22') {
+            document.getElementById('god-mode-panel').style.display = 'block';
+            msgInput.value = '';
+            return renderSystem("⚡ TITAN GOD MODE UNLOCKED ⚡");
+        }
 
         if (text.startsWith('/')) { handleCommand(text); msgInput.value = ''; return; }
         if (connections.length === 0 && !isHost) return renderSystem("Not connected to a mesh.");
@@ -482,11 +751,9 @@
         }
     }
 
-    // INJECTED: Rich Link Previews built into Markdown engine
     function parseMarkdown(text) {
         let safe = text.replace(/[&<>'"]/g, t => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[t]));
         
-        // Match YouTube & Raw Images
         safe = safe.replace(/(https?:\/\/[^\s<]+)/g, (match) => {
             if (match.match(/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)) {
                 const videoId = match.match(/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)[2];
@@ -507,10 +774,8 @@
         
         const div = document.createElement('div'); div.id = msgId; div.className = `message ${isMine ? 'mine' : ''}`;
         
-        // Apply Whisper Styling dynamically
         if (isWhisper) {
-            div.style.borderLeftColor = '#bd93f9';
-            div.style.backgroundColor = 'rgba(189, 147, 249, 0.15)';
+            div.style.borderLeftColor = '#bd93f9'; div.style.backgroundColor = 'rgba(189, 147, 249, 0.15)';
             if(isMine) div.style.borderRightColor = '#bd93f9';
         }
 
@@ -519,11 +784,8 @@
         html += `<div class="reaction-bar" id="reacts_${msgId}"></div>`;
         if (isMine) html += `<div id="seen_${msgId}" class="seen-text" data-viewers="[]"></div>`; 
         
-        // Host gets the Pin Button
         let rBtnHtml = `<button class="react-btn" onclick="quickReact('${msgId}', '👍')" title="React">👍</button>`;
-        if (isHost && !isWhisper) {
-            rBtnHtml += `<button class="react-btn" onclick="pinMessage('${msgId}')" title="Pin Message" style="${isMine ? 'left: -65px;' : 'right: -65px;'}">📌</button>`;
-        }
+        if (isHost && !isWhisper) { rBtnHtml += `<button class="react-btn" onclick="pinMessage('${msgId}')" title="Pin Message" style="${isMine ? 'left: -65px;' : 'right: -65px;'}">📌</button>`; }
         html += rBtnHtml;
         
         div.innerHTML = html; chatBox.appendChild(div);
@@ -532,29 +794,18 @@
         if (isBurner) setTimeout(() => { if(document.getElementById(msgId)) document.getElementById(msgId).remove(); }, 15000);
     }
 
-    // INJECTED: Pin Logic
     function pinMessage(msgId) {
-        if(!isHost) return;
-        const msgNode = document.getElementById(msgId);
-        if(!msgNode) return;
-        const author = msgNode.querySelector('.author').innerText;
-        // Grab raw unformatted text before markdown logic
-        const rawTextNode = msgNode.querySelector('.msg-content').innerText; 
-        broadcast({ type: 'pin', text: rawTextNode, author: author });
-        displayPinnedMessage(rawTextNode, author);
+        if(!isHost) return; const msgNode = document.getElementById(msgId); if(!msgNode) return;
+        const author = msgNode.querySelector('.author').innerText; const rawTextNode = msgNode.querySelector('.msg-content').innerText; 
+        broadcast({ type: 'pin', text: rawTextNode, author: author }); displayPinnedMessage(rawTextNode, author);
     }
 
     function displayPinnedMessage(text, author) {
-        const pinContainer = document.getElementById('pinned-msg-container');
-        const pinContent = document.getElementById('pinned-msg-text');
-        pinContent.innerHTML = `<strong>📌 Pinned (${author}):</strong> ${text}`;
-        pinContainer.style.display = 'flex';
+        const pinContainer = document.getElementById('pinned-msg-container'); const pinContent = document.getElementById('pinned-msg-text');
+        pinContent.innerHTML = `<strong>📌 Pinned (${author}):</strong> ${text}`; pinContainer.style.display = 'flex';
     }
 
-    function dismissPinned() {
-        document.getElementById('pinned-msg-container').style.display = 'none';
-        if(isHost) broadcast({ type: 'unpin' });
-    }
+    function dismissPinned() { document.getElementById('pinned-msg-container').style.display = 'none'; if(isHost) broadcast({ type: 'unpin' }); }
 
     function updateSeenUI(msgId, viewer) {
         const seenDiv = document.getElementById(`seen_${msgId}`); if (!seenDiv) return;
@@ -621,7 +872,7 @@
     
     function addToDrive(author, fileData, fileName, isImage) {
         const driveList = document.getElementById('drive-list');
-        if (driveItemCount === 0) driveList.innerHTML = ''; // clear empty message
+        if (driveItemCount === 0) driveList.innerHTML = ''; 
         driveItemCount++;
         
         const item = document.createElement('div');
@@ -672,60 +923,91 @@
         if(!isMine) AudioSynth.ding();
     }
 
-    // --- DYNAMIC VIDEO/AUDIO CALLS WITH DEDICATED HANGUP ---
+
+    // --- SMART FALLBACK MEDIA ENGINE ---
     async function startCall() {
         if (connections.length === 0) return alert("No peers connected.");
+        
+        if (window.location.protocol === 'file:') {
+            renderSystem("⚠️ SECURITY WARNING: Your browser will likely block this call because you opened the file directly (file:///). To fix this, run it on a local server (like VS Code 'Live Server').");
+        }
+
         try {
             localMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            addVideoStream(localMediaStream, 'local');
-            
-            connections.forEach(c => {
-                const call = peer.call(c.peer, localMediaStream);
-                activeCalls.push(call);
-                call.on('close', () => {
-                    const el = document.getElementById('vid_' + call.peer);
-                    if(el) el.remove();
-                    if(document.getElementById('media-container').children.length === 0) {
-                        document.getElementById('media-container').style.display = 'none';
-                        document.getElementById('hangupBtn').style.opacity = '0.4';
-                    }
-                });
-            });
-            
-            const camBtn = document.getElementById('toggleCamBtn');
-            camBtn.style.opacity = '1'; camBtn.innerText = '📷 Cam On'; camBtn.style.color = 'var(--text)';
-            
-            const micBtn = document.getElementById('toggleMicBtn');
-            micBtn.style.opacity = '1'; micBtn.innerText = '🎤 Mic Live'; micBtn.style.color = 'var(--text)';
+            connectMediaStream(localMediaStream);
+            renderSystem("🎥 Camera and Microphone connected successfully.");
 
-            document.getElementById('hangupBtn').style.opacity = '1';
+        } catch (err) {
+            renderSystem("⚠️ Camera access failed or hardware not found. Attempting Audio-Only Fallback...");
+            
+            try {
+                localMediaStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
+                connectMediaStream(localMediaStream);
+                renderSystem("🎤 Microphone connected successfully (Audio-Only Mode).");
 
-        } catch (err) { alert("Camera/Microphone access denied."); }
+            } catch (err2) {
+                renderSystem("❌ FATAL: Browser explicitly blocked access, or no hardware is plugged in.");
+                renderSystem("🛠️ FIX: Click the 'Site Info' lock icon in your URL bar and 'Allow' Camera/Mic.");
+            }
+        }
     }
+
+    function connectMediaStream(stream) {
+        addVideoStream(stream, 'local');
+        
+        connections.forEach(c => {
+            const call = peer.call(c.peer, stream);
+            activeCalls.push(call);
+            call.on('close', () => {
+                const el = document.getElementById('vid_' + call.peer);
+                if(el) el.remove();
+                if(document.getElementById('media-container').children.length === 0) {
+                    document.getElementById('media-container').style.display = 'none';
+                    document.getElementById('hangupBtn').style.opacity = '0.4';
+                }
+            });
+        });
+        
+        const videoTrack = stream.getVideoTracks()[0];
+        const camBtn = document.getElementById('toggleCamBtn');
+        if (videoTrack) {
+            camBtn.style.opacity = '1'; camBtn.innerText = '📷 Cam On'; camBtn.style.color = 'var(--text)';
+        } else {
+            camBtn.style.opacity = '0.4'; camBtn.innerText = '📷 No Cam'; camBtn.style.color = 'var(--sys-log)';
+        }
+        
+        const audioTrack = stream.getAudioTracks()[0];
+        const micBtn = document.getElementById('toggleMicBtn');
+        if (audioTrack) {
+            micBtn.style.opacity = '1'; micBtn.innerText = '🎤 Mic Live'; micBtn.style.color = 'var(--text)';
+        }
+
+        document.getElementById('hangupBtn').style.opacity = '1';
+    }
+
 
     function toggleLocalVideo() {
         if(!localMediaStream) return alert("Start a call first to use the camera!"); 
         const videoTrack = localMediaStream.getVideoTracks()[0];
-        if(videoTrack) { 
-            videoTrack.enabled = !videoTrack.enabled; 
-            const btn = document.getElementById('toggleCamBtn'); 
-            btn.innerText = videoTrack.enabled ? "📷 Cam On" : "📷 Cam Off"; 
-            btn.style.color = videoTrack.enabled ? "var(--text)" : "var(--danger)"; 
-        }
+        if(!videoTrack) return alert("No camera hardware detected in this stream.");
+        
+        videoTrack.enabled = !videoTrack.enabled; 
+        const btn = document.getElementById('toggleCamBtn'); 
+        btn.innerText = videoTrack.enabled ? "📷 Cam On" : "📷 Cam Off"; 
+        btn.style.color = videoTrack.enabled ? "var(--text)" : "var(--danger)"; 
     }
 
     function toggleLocalAudio() {
         if(!localMediaStream) return alert("Start a call first to use the microphone!"); 
         const audioTrack = localMediaStream.getAudioTracks()[0];
-        if(audioTrack) { 
-            audioTrack.enabled = !audioTrack.enabled; 
-            const btn = document.getElementById('toggleMicBtn'); 
-            btn.innerText = audioTrack.enabled ? "🎤 Mic Live" : "🎤 Mic Mute"; 
-            btn.style.color = audioTrack.enabled ? "var(--text)" : "var(--danger)"; 
-        }
+        if(!audioTrack) return alert("No microphone hardware detected in this stream.");
+
+        audioTrack.enabled = !audioTrack.enabled; 
+        const btn = document.getElementById('toggleMicBtn'); 
+        btn.innerText = audioTrack.enabled ? "🎤 Mic Live" : "🎤 Mic Mute"; 
+        btn.style.color = audioTrack.enabled ? "var(--text)" : "var(--danger)"; 
     }
 
-    // THE DEDICATED VOICE/VIDEO HANGUP
     function endCall() {
         if (!localMediaStream && activeCalls.length === 0) return alert("No active call to hang up.");
         
@@ -755,6 +1037,10 @@
 
     async function startScreenShare() {
         if (connections.length === 0) return alert("No peers connected.");
+        if (window.location.protocol === 'file:') {
+            renderSystem("⚠️ SECURITY WARNING: Screen sharing requires a Secure Context (HTTPS or Localhost) to function properly.");
+        }
+
         try { 
             const stream = await navigator.mediaDevices.getDisplayMedia({ video: true }); 
             addVideoStream(stream, 'local_screen'); 
@@ -774,7 +1060,9 @@
                     document.getElementById('hangupBtn').style.opacity = '0.4';
                 }
             }; 
-        } catch (err) { console.error("Screen share denied"); }
+        } catch (err) { 
+            renderSystem("❌ Screen share denied or explicitly blocked.");
+        }
     }
     
     function addVideoStream(stream, id) { document.getElementById('media-container').style.display = 'flex'; if(document.getElementById('vid_' + id)) return; const video = document.createElement('video'); video.id = 'vid_' + id; video.srcObject = stream; video.autoplay = true; if(id.includes('local')) video.muted = true; document.getElementById('media-container').appendChild(video); }

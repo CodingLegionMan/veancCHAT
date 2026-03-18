@@ -47,14 +47,15 @@
         button:hover, button:focus { filter: brightness(1.2); transform: translateY(-1px); }
         button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
 
-        /* Chat Screen */
-        #chat-screen { display: none; flex: 1; flex-direction: column; position: relative; }
+        /* Chat Screen (FIXED LAYOUT BUG) */
+        #chat-screen { display: none; flex: 1; flex-direction: column; position: relative; overflow: hidden; }
         .top-bar { display: flex; justify-content: space-between; padding: 15px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); align-items: center; flex-wrap: wrap; gap: 10px; }
         
         .pin-badge { background: var(--accent); color: var(--bg); padding: 5px 15px; font-family: monospace; font-size: 1.2rem; font-weight: bold; border-radius: 4px; cursor: pointer; letter-spacing: 2px; }
         .pin-badge:hover { background: var(--text); color: var(--bg); }
 
-        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative; scroll-behavior: smooth; }
+        /* Messages Container (FIXED LAYOUT BUG) */
+        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative; scroll-behavior: smooth; min-height: 0; }
         .message { position: relative; max-width: 75%; padding: 12px 16px; background: rgba(0,0,0,0.4); border-radius: 8px; border-left: 4px solid var(--border); align-self: flex-start; line-height: 1.4; word-wrap: break-word; }
         .message.mine { align-self: flex-end; border-left: none; border-right: 4px solid var(--accent); background: rgba(255,255,255,0.05); }
         .author { font-size: 0.85em; color: var(--accent); margin-bottom: 4px; font-weight: bold; }
@@ -345,7 +346,6 @@
     });
 
     chatBox.addEventListener('scroll', () => {
-        // Fixed: Added larger math margin (80px) to prevent getting stuck due to smooth-scrolling or fractional pixels
         const distanceToBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
         if (distanceToBottom < 80) scrollAlert.style.display = 'none';
     });
@@ -356,7 +356,6 @@
     }
 
     function renderMessage(msgId, author, text, isMine, isBurner) {
-        // Calculate scroll state BEFORE appending to ensure accurate math
         const distanceToBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
         const isScrolledUp = distanceToBottom > 80; 
         
@@ -370,7 +369,6 @@
         
         div.innerHTML = html; chatBox.appendChild(div);
 
-        // Fixed Scroll Logic: Use slight timeout to let DOM render
         if (!isScrolledUp || isMine) {
             setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 10);
             if(isMine) scrollAlert.style.display = 'none';
@@ -379,7 +377,7 @@
         }
 
         if (!isMine) {
-            AudioSynth.ding(); // Play Receive Sound
+            AudioSynth.ding(); 
             if(document.hidden) { unreadCount++; document.title = `(${unreadCount}) New! - veancCHAT`; }
         }
         

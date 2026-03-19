@@ -10,37 +10,41 @@
 
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
+    /* 1. Organize the container so videos sit nicely next to each other */
+#media-container {
+    display: flex;
+    flex-wrap: wrap;          /* Lets videos drop to the next line if there are many */
+    justify-content: center;  /* Centers the videos */
+    gap: 15px;                /* Adds space between multiple videos */
+    padding: 20px;
+}
+
+/* 2. Lock down the video sizes */
+#media-container video {
+    width: 100%;
+    max-width: 400px;         /* This stops the video from becoming a giant */
+    aspect-ratio: 16 / 9;     /* Forces a standard widescreen webcam shape */
+    object-fit: cover;        /* Now 'cover' works perfectly inside this controlled box */
+    
+    /* Optional styling to match your Titan Master theme */
+    background-color: #000;
+    border-radius: 8px;       
+    border: 2px solid var(--border); 
+}
         /* --- THEME ENGINE --- */
         :root {
             --bg: #0a0a0a; --panel: #111; --border: #00ff41; --text: #fff; 
             --accent: #00ff41; --danger: #ff4444; --sys-log: #555; --font-size: 16px;
         }
-        
-        [data-theme="soft"] {
-            --bg: #1e1e2e; --panel: #282a36; --border: #6272a4; --text: #f8f8f2; 
-            --accent: #bd93f9; --danger: #ff5555; --sys-log: #8be9fd;
-        }
+        [data-theme="soft"] { --bg: #1e1e2e; --panel: #282a36; --border: #6272a4; --text: #f8f8f2; --accent: #bd93f9; --danger: #ff5555; --sys-log: #8be9fd; }
+        [data-theme="contrast"] { --bg: #000000; --panel: #000000; --border: #ffff00; --text: #ffffff; --accent: #ffff00; --danger: #ff0000; --sys-log: #aaaaaa; }
+        [data-theme="light"] { --bg: #f4f4f9; --panel: #ffffff; --border: #cccccc; --text: #333333; --accent: #0055ff; --danger: #d90000; --sys-log: #777777; }
+        [data-theme="cyberpunk"] { --bg: #0d0221; --panel: #14042b; --border: #f0f600; --text: #00f0ff; --accent: #ff003c; --danger: #ff0000; --sys-log: #00ff00; }
+        [data-theme="synthwave"] { --bg: #11001c; --panel: #2a004a; --border: #ff00a0; --text: #f8eeff; --accent: #00ffff; --danger: #ff3366; --sys-log: #fdb927; }
+        [data-theme="dracula"] { --bg: #282a36; --panel: #44475a; --border: #ff79c6; --text: #f8f8f2; --accent: #50fa7b; --danger: #ff5555; --sys-log: #8be9fd; }
+        [data-theme="matrix"] { --bg: #000000; --panel: #001100; --border: #00ff00; --text: #00ff00; --accent: #00ff00; --danger: #ff0000; --sys-log: #008800; }
 
-        [data-theme="contrast"] {
-            --bg: #000000; --panel: #000000; --border: #ffff00; --text: #ffffff; 
-            --accent: #ffff00; --danger: #ff0000; --sys-log: #aaaaaa;
-        }
-
-        [data-theme="light"] {
-            --bg: #f4f4f9; --panel: #ffffff; --border: #cccccc; --text: #333333; 
-            --accent: #0055ff; --danger: #d90000; --sys-log: #777777;
-        }
-
-        [data-theme="cyberpunk"] {
-            --bg: #0d0221; --panel: #14042b; --border: #f0f600; --text: #00f0ff; 
-            --accent: #ff003c; --danger: #ff0000; --sys-log: #00ff00;
-        }
-
-        [data-theme="synthwave"] {
-            --bg: #11001c; --panel: #2a004a; --border: #ff00a0; --text: #f8eeff; 
-            --accent: #00ffff; --danger: #ff3366; --sys-log: #fdb927;
-        }
-
+        /* ACCESSIBILITY TOGGLES */
         body.dyslexia-font * { font-family: 'Comic Sans MS', 'OpenDyslexic', 'Segoe UI', sans-serif !important; letter-spacing: 0.5px !important; }
         body.no-animations * { transition: none !important; scroll-behavior: auto !important; }
 
@@ -81,11 +85,27 @@
         .drive-item img { max-width: 100%; border-radius: 4px; border: 1px solid var(--sys-log); }
         .drive-meta { font-size: 0.75rem; color: var(--sys-log); margin-top: 5px; font-style: italic; }
 
-        #god-mode-panel { display: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 400px; background: rgba(20, 0, 30, 0.95); border: 2px solid #9d00ff; border-radius: 8px; padding: 20px; z-index: 999; box-shadow: 0 0 40px rgba(157, 0, 255, 0.5); backdrop-filter: blur(10px); }
-        .god-header { color: #9d00ff; font-weight: bold; font-size: 1.3rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 2px; }
-        .god-input { width: 100%; background: #000; border: 1px solid #9d00ff; color: #fff; padding: 8px; margin-bottom: 10px; }
-        .god-btn { background: #9d00ff; color: #fff; border: none; padding: 8px 12px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
-        .god-btn:hover { filter: brightness(1.3); }
+        /* INJECTED: DISCORD CALL GRID CSS */
+        #media-container { display: none; padding: 10px; background: #000; border-bottom: 1px solid var(--border); gap: 10px; overflow-x: auto; align-items: center; position: relative; }
+        #media-container.video-grid-mode { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 70; flex-wrap: wrap; justify-content: center; align-content: center; background: rgba(0,0,0,0.95); padding: 40px; }
+        video { height: 150px; border: 1px solid var(--accent); border-radius: 4px; background: #111; object-fit: cover; transition: 0.3s all; }
+        #media-container.video-grid-mode video { height: 40%; min-width: 300px; flex-grow: 1; }
+        .focus-cams-btn { position: absolute; right: 10px; top: 10px; background: var(--accent); color: var(--bg); border: none; padding: 5px 10px; font-weight: bold; border-radius: 4px; cursor: pointer; z-index: 75; }
+
+        /* INJECTED: REPLY UI CSS */
+        #reply-preview-bar { display: none; background: rgba(0,0,0,0.5); border-top: 1px solid var(--border); padding: 8px 20px; font-size: 0.8rem; color: var(--sys-log); align-items: center; justify-content: space-between; }
+        .reply-block { border-left: 3px solid var(--accent); background: rgba(255,255,255,0.05); padding: 5px 10px; margin-bottom: 8px; border-radius: 0 4px 4px 0; font-size: 0.85em; color: var(--sys-log); }
+        
+        /* INJECTED: GLOBAL MESH PET */
+        #mesh-pet-container { position: absolute; bottom: 80px; left: 20px; background: rgba(0,0,0,0.8); border: 1px solid var(--accent); padding: 10px; border-radius: 8px; z-index: 40; display: none; font-size: 0.85rem; text-align: center; font-family: monospace; backdrop-filter: blur(5px); }
+        .pet-face { font-size: 1.5rem; margin-bottom: 5px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        /* INJECTED: GOD MODE TROLL CLASSES */
+        @keyframes violently-spin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.5); } 100% { transform: rotate(360deg) scale(1); } }
+        .jumpscare-face { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; align-items: center; justify-content: center; font-size: 15rem; animation: violently-spin 0.3s infinite linear; pointer-events: none; }
+        .drunk-mode { animation: drunk-wobble 3s infinite ease-in-out; filter: blur(1.5px) hue-rotate(90deg); pointer-events: none; }
+        @keyframes drunk-wobble { 0%, 100% { transform: rotate(-2deg) scale(1.02); } 50% { transform: rotate(2deg) scale(0.98); } }
 
         .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; position: relative; scroll-behavior: smooth; min-height: 0; }
         .message { position: relative; max-width: 75%; padding: 12px 16px; background: rgba(0,0,0,0.4); border-radius: 8px; border-left: 4px solid var(--border); align-self: flex-start; line-height: 1.4; word-wrap: break-word; }
@@ -102,21 +122,28 @@
         .message.mine .react-btn { right: auto; left: -30px; }
         .message:hover .react-btn { opacity: 1; }
 
+        /* MULTI-BUTTON FIX FOR HOVER */
+        .msg-actions { position: absolute; right: -60px; top: 50%; transform: translateY(-50%); display: flex; gap: 2px; opacity: 0; transition: opacity 0.2s; }
+        .message.mine .msg-actions { right: auto; left: -60px; flex-direction: row-reverse; }
+        .message:hover .msg-actions { opacity: 1; }
+        .action-btn { background: transparent; border: none; font-size: 1.1em; cursor: pointer; padding: 2px; color: var(--accent); }
+
         .chat-img { max-width: 100%; max-height: 250px; border-radius: 4px; margin-top: 8px; border: 1px solid var(--accent); cursor: pointer; }
         .chat-file { display: inline-block; padding: 8px; background: rgba(0,0,0,0.5); border: 1px dashed var(--accent); margin-top: 8px; text-decoration: none; color: var(--accent); font-family: monospace; word-break: break-all; }
         code { background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 3px; font-family: monospace; color: var(--accent); }
 
-        /* INJECTED: GAMES UI */
+        /* GAMES UI */
         .game-box { background: rgba(0,0,0,0.6); border: 1px solid var(--accent); padding: 15px; border-radius: 6px; margin-top: 10px; text-align: center; font-family: monospace; }
         .game-title { color: var(--accent); font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; font-size: 1.1rem; }
         .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 150px; margin: 0 auto; }
-        .ttt-cell { height: 45px; background: var(--panel); border: 1px solid var(--border); color: var(--text); font-size: 1.2rem; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.1s; }
+        .ttt-cell { height: 45px; background: var(--panel); border: 1px solid var(--border); color: var(--text); font-size: 1.2rem; font-weight: bold; cursor: pointer; border-radius: 4px; }
         .ttt-cell:hover { background: var(--accent); color: var(--bg); }
         .game-btn { background: var(--accent); color: var(--bg); border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; margin: 5px; transition: 0.2s; width: auto; display: inline-block; }
         .game-btn:hover { filter: brightness(1.2); }
         .game-input { background: var(--panel); border: 1px solid var(--accent); color: var(--text); padding: 8px; width: 80px; text-align: center; border-radius: 4px; display: inline-block; margin: 0; }
         .game-bar { width: 100%; height: 20px; background: #222; border: 1px solid var(--sys-log); position: relative; margin-top: 10px; border-radius: 10px; overflow: hidden; }
         .game-bar-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.1s; }
+        .canvas-game { background: #000; border: 2px solid var(--accent); outline: none; margin-top: 5px; }
 
         #typingIndicator { font-size: 0.85em; color: var(--sys-log); font-style: italic; padding: 0 20px 5px 20px; height: 20px; display: flex; align-items: center; }
         #scrollAlert { position: absolute; bottom: 80px; right: 20px; background: var(--accent); color: var(--bg); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 10; display: none; }
@@ -136,20 +163,25 @@
         #whiteboardModal.fullscreen-active .modal-content { width: 100vw; height: 100vh; max-width: none; border-radius: 0; border: none; top: 0; left: 0; position: absolute; }
         #wbCanvas { flex: 1; background: #fff; border: 2px solid var(--border); cursor: crosshair; touch-action: none; border-radius: 4px; min-height: 0; }
         .wb-controls { display: flex; gap: 10px; margin-top: 15px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
-        
         .wb-controls input[type="color"] { cursor: pointer; border: 1px solid var(--accent); background: #000; height: 35px; width: 40px; }
         .wb-controls input[type="range"] { cursor: pointer; accent-color: var(--accent); width: 100px; }
 
         .theme-btn-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        #media-container { display: none; padding: 10px; background: #000; border-bottom: 1px solid var(--border); gap: 10px; overflow-x: auto; align-items: center; }
-        video { height: 150px; border: 1px solid var(--accent); border-radius: 4px; background: #111; }
-        .hidden { display: none !important; }
         
+        #god-mode-panel { display: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 400px; background: rgba(20, 0, 30, 0.95); border: 2px solid #9d00ff; border-radius: 8px; padding: 20px; z-index: 999; box-shadow: 0 0 40px rgba(157, 0, 255, 0.5); backdrop-filter: blur(10px); }
+        .god-header { color: #9d00ff; font-weight: bold; font-size: 1.3rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 2px; }
+        .god-input { width: 100%; background: #000; border: 1px solid #9d00ff; color: #fff; padding: 8px; margin-bottom: 10px; }
+        .god-btn { background: #9d00ff; color: #fff; border: none; padding: 8px 12px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
+        .god-btn:hover { filter: brightness(1.3); }
+
+        .hidden { display: none !important; }
         .acc-toggle { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; color: var(--text); }
         .acc-toggle input { cursor: pointer; }
     </style>
 </head>
 <body>
+
+<div id="jumpscare-container" style="display:none;"></div>
 
 <div id="settingsModal" class="modal">
     <div class="modal-content">
@@ -162,6 +194,8 @@
             <button class="secondary" onclick="setTheme('light')" style="width: auto;">Light</button>
             <button class="secondary" onclick="setTheme('cyberpunk')" style="width: auto;">Cyberpunk</button>
             <button class="secondary" onclick="setTheme('synthwave')" style="width: auto;">Synthwave</button>
+            <button class="secondary" onclick="setTheme('dracula')" style="width: auto;">Dracula</button>
+            <button class="secondary" onclick="setTheme('matrix')" style="width: auto;">Matrix</button>
         </div>
         
         <p style="margin-bottom: 5px;"><strong>Text Size</strong></p>
@@ -174,12 +208,8 @@
         <input type="range" id="audioVolume" min="0" max="1" step="0.1" value="0.5" onchange="updateVolume()" style="width: 100%; margin-bottom: 20px;">
 
         <p style="margin-bottom: 5px;"><strong>Accessibility Toggles</strong></p>
-        <label class="acc-toggle">
-            <input type="checkbox" id="dyslexiaToggle" onchange="toggleDyslexia()"> Enable Dyslexia-Friendly Font
-        </label>
-        <label class="acc-toggle">
-            <input type="checkbox" id="animationToggle" onchange="toggleAnimations()"> Disable UI Animations
-        </label>
+        <label class="acc-toggle"><input type="checkbox" id="dyslexiaToggle" onchange="toggleDyslexia()"> Enable Dyslexia-Friendly Font</label>
+        <label class="acc-toggle"><input type="checkbox" id="animationToggle" onchange="toggleAnimations()"> Disable UI Animations</label>
 
         <button onclick="document.getElementById('settingsModal').style.display='none'" style="margin-top: 20px;">Close Settings</button>
     </div>
@@ -191,48 +221,48 @@
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <button class="secondary" onclick="launchGame('tictactoe')">⭕ Mesh-Tac-Toe</button>
             <button class="secondary" onclick="launchGame('roulette')">🔫 Cyber Roulette</button>
-            <button class="secondary" onclick="launchGame('vault')">🔓 Vault Cracker (1-100)</button>
+            <button class="secondary" onclick="launchGame('vault')">🔓 Vault Cracker</button>
             <button class="secondary" onclick="launchGame('reaction')">⚡ Reaction Hack</button>
             <button class="secondary" onclick="launchGame('overload')">💥 Mesh Overload (Co-op)</button>
+            <div style="height:1px; background:var(--sys-log); margin: 5px 0;"></div>
+            <button class="secondary" onclick="launchLocalGame('snake')">🐍 8-Bit Snake (Local to Mesh)</button>
+            <button class="secondary" onclick="launchLocalGame('pong')">🏓 Solo Pong (Local to Mesh)</button>
         </div>
         <button onclick="document.getElementById('gamesModal').style.display='none'" style="margin-top: 20px;">Close Center</button>
     </div>
 </div>
 
 <div id="god-mode-panel">
-    <div class="god-header">
-        ⚡ TITAN GOD MODE
-        <button style="width:auto; padding:2px 8px; margin:0; background:transparent; color:#9d00ff; border:none;" onclick="document.getElementById('god-mode-panel').style.display='none'">✖</button>
-    </div>
+    <div class="god-header">⚡ TITAN GOD MODE <button style="width:auto; padding:2px 8px; margin:0; background:transparent; color:#9d00ff; border:none;" onclick="document.getElementById('god-mode-panel').style.display='none'">✖</button></div>
     
-    <input type="text" id="godSpoofName" class="god-input" placeholder="Spoof Target Name...">
+    <input type="text" id="godTarget" class="god-input" placeholder="Target Name (or 'all')..." value="all">
+    
+    <input type="text" id="godSpoofName" class="god-input" placeholder="Spoof Name...">
     <input type="text" id="godSpoofMsg" class="god-input" placeholder="Spoof Message...">
     <button class="god-btn" onclick="execGodSpoof()">Send Spoofed Message</button>
+    <div style="height:1px; background:#9d00ff; margin: 10px 0;"></div>
     
-    <div style="height:1px; background:#9d00ff; margin: 15px 0;"></div>
-    
-    <input type="text" id="godRenameOld" class="god-input" placeholder="Target's Current Name...">
     <input type="text" id="godRenameNew" class="god-input" placeholder="Force New Name...">
-    <button class="god-btn" onclick="execGodRename()">Force Rename</button>
-    
-    <div style="height:1px; background:#9d00ff; margin: 15px 0;"></div>
+    <button class="god-btn" onclick="execGodRename()">Force Target Rename</button>
+    <div style="height:1px; background:#9d00ff; margin: 10px 0;"></div>
     
     <input type="text" id="godGhostMsg" class="god-input" placeholder="System Ghost Message...">
     <button class="god-btn" onclick="execGodGhost()">Send Ghost Broadcast</button>
+    <div style="height:1px; background:#9d00ff; margin: 10px 0;"></div>
     
-    <div style="height:1px; background:#9d00ff; margin: 15px 0;"></div>
-    
-    <div style="display:flex; gap:10px;">
-        <button class="god-btn" onclick="execGodTheme()">Force Cyberpunk</button>
-        <button class="god-btn" onclick="execGodFlashbang()">Trigger Flashbang</button>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="god-btn" style="width:48%;" onclick="execGodTheme()">Force Matrix</button>
+        <button class="god-btn" style="width:48%;" onclick="execGodFlashbang()">Flashbang</button>
+        <button class="god-btn" style="width:48%; background:var(--danger);" onclick="execGodFace()">🤪 Stupid Face</button>
+        <button class="god-btn" style="width:48%; background:var(--danger);" onclick="execGodDrunk()">🍺 Drunk Mode</button>
     </div>
-    <button class="god-btn" style="background:var(--danger);" onclick="execGodWipe()">Total Mesh Wipe</button>
+    <button class="god-btn" style="background:var(--danger); margin-top:10px;" onclick="execGodWipe()">Total Mesh Wipe</button>
 </div>
 
 <div id="whiteboardModal" class="modal">
     <div class="modal-content">
         <h3 style="color: var(--accent); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-            🎨 Tactical Whiteboard
+            🎨 Co-op Whiteboard
             <button class="secondary" onclick="toggleWbFullscreen()" style="width: auto; padding: 5px 10px; margin: 0; font-size: 0.8rem;">⛶ Fullscreen</button>
         </h3>
         <canvas id="wbCanvas"></canvas>
@@ -240,8 +270,8 @@
             <input type="color" id="wbColor" value="#00ff41" title="Brush Color">
             <input type="range" id="wbSize" min="1" max="20" value="3" title="Brush Size">
             <div style="flex:1"></div> <button class="secondary" onclick="clearCanvas()" style="width:auto; margin:0;">Clear</button>
-            <button class="secondary" onclick="closeWhiteboard()" style="width:auto; margin:0; border-color: var(--danger); color: var(--danger);">Cancel</button>
-            <button onclick="sendWhiteboard()" style="width:auto; margin:0;">Blast to Mesh</button>
+            <button class="secondary" onclick="closeWhiteboard()" style="width:auto; margin:0; border-color: var(--danger); color: var(--danger);">Close</button>
+            <button onclick="sendWhiteboard()" style="width:auto; margin:0;">Save to Chat</button>
         </div>
     </div>
 </div>
@@ -277,45 +307,53 @@
             
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <span id="pingDisplay" style="color: var(--sys-log); font-size: 0.8rem; font-family: monospace;">[ PING: --ms ]</span>
-                <span id="peerCount" style="color: var(--accent); font-weight: bold; margin-right: 10px;">Peers: 1</span>
+                <span id="peerCount" style="color: var(--accent); font-weight: bold; margin-right: 10px;">People: 1</span>
                 
                 <button id="toggleCamBtn" class="secondary" onclick="toggleLocalVideo()" style="width: auto; padding: 5px 10px; margin:0; font-size: 0.8rem; border-color: var(--sys-log); opacity: 0.4;">📷 Cam Off</button>
                 <button id="toggleMicBtn" class="secondary" onclick="toggleLocalAudio()" style="width: auto; padding: 5px 10px; margin:0; font-size: 0.8rem; border-color: var(--sys-log); opacity: 0.4;">🎤 Mic Mute</button>
                 <button id="hangupBtn" class="secondary" onclick="endCall()" style="width: auto; padding: 5px 10px; margin:0; font-size: 0.8rem; border-color: var(--danger); color: var(--danger); opacity: 0.4;">❌ Hangup</button>
                 
                 <button class="secondary" onclick="openWhiteboard()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">🎨 Draw</button>
-                <button class="secondary" onclick="toggleDrive()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem; border-color: #bd93f9; color: #bd93f9;">📂 Mesh Drive</button>
+                <button class="secondary" onclick="toggleDrive()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem; border-color: #bd93f9; color: #bd93f9;">📂 Drive</button>
                 <button class="secondary" onclick="startCall()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">📞 Call</button>
-                <button class="secondary" onclick="startScreenShare()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">🖥️ Screen</button>
             </div>
         </div>
 
-        <div id="media-container"></div>
+        <div id="media-container">
+            <button class="focus-cams-btn" onclick="toggleVideoGrid()">⛶ Focus Cams</button>
+        </div>
+        
         <div id="scrollAlert" onclick="scrollToBottom()">↓ New Messages</div>
         
-        <div id="pinned-msg-container">
-            <div id="pinned-msg-text"></div>
-            <button class="secondary" onclick="dismissPinned()" style="width:auto; padding: 2px 8px; margin:0; border: none; font-size: 1rem; color: var(--danger);">✖</button>
-        </div>
+        <div id="pinned-msg-container"><div id="pinned-msg-text"></div><button class="secondary" onclick="dismissPinned()" style="width:auto; padding: 2px 8px; margin:0; border: none; font-size: 1rem; color: var(--danger);">✖</button></div>
 
         <div id="drive-panel">
-            <div class="drive-header">
-                📂 Mesh Drive
-                <button class="secondary" onclick="toggleDrive()" style="width:auto; padding: 4px 10px; margin:0; border: none;">✖</button>
-            </div>
-            <div id="drive-list">
-                <div style="color: var(--sys-log); font-size: 0.85rem; text-align: center; margin-top: 20px;">Drive is empty. Paste files or draw to populate.</div>
+            <div class="drive-header">📂 Mesh Drive <button class="secondary" onclick="toggleDrive()" style="width:auto; padding: 4px 10px; margin:0; border: none;">✖</button></div>
+            <div id="drive-list"><div style="color: var(--sys-log); font-size: 0.85rem; text-align: center; margin-top: 20px;">Drive is empty.</div></div>
+        </div>
+
+        <div id="mesh-pet-container">
+            <div class="pet-face" id="petFace">(ᵔᴥᵔ)</div>
+            <div id="petStatus" style="color:var(--accent); font-weight:bold; margin-bottom:5px;">Happy</div>
+            <div style="display:flex; gap:5px; justify-content:center;">
+                <button class="secondary" onclick="interactPet('feed')" style="padding:2px 8px; font-size:0.75rem;">🍖 Feed</button>
+                <button class="secondary" onclick="interactPet('pet')" style="padding:2px 8px; font-size:0.75rem;">✋ Pet</button>
             </div>
         </div>
 
         <div class="messages" id="chatBox"></div>
         <div id="typingIndicator"></div>
 
+        <div id="reply-preview-bar">
+            <span>Replying to <strong id="reply-preview-user" style="color:var(--accent);"></strong>: <span id="reply-preview-text" style="font-style:italic;"></span></span>
+            <button class="secondary" onclick="cancelReply()" style="width:auto; padding:2px 8px; margin:0; border:none; color:var(--danger);">✖</button>
+        </div>
+
         <div class="input-area">
             <label title="Destructs messages in 15s" style="cursor: pointer; color: var(--danger); font-weight: bold; border: 1px solid var(--danger); padding: 10px; border-radius: 4px; display: flex; align-items: center; gap: 5px;">
                 <input type="checkbox" id="burnerToggle"> 🔥 Burner
             </label>
-            <input type="text" id="msgInput" placeholder="Type message or /w [Name]... (Paste files with Ctrl+V)" autocomplete="off">
+            <input type="text" id="msgInput" placeholder="Type message, /w [Name], or /commands..." autocomplete="off">
             <button class="secondary" onclick="document.getElementById('gamesModal').style.display='flex'" style="width: auto; padding: 12px 15px; margin:0; border-color: #00f0ff; color: #00f0ff;" title="Mini Games">🎮</button>
             <button class="secondary" onclick="toggleEmojiBoard()" style="width: auto; padding: 12px 15px; margin:0;">😀</button>
             <div id="emojiBoard"></div>
@@ -346,21 +384,20 @@
         drop: function() { this.playTone(400, 'sawtooth', 0.2, 0.02); setTimeout(()=>this.playTone(200, 'sawtooth', 0.2, 0.02), 150); }
     };
 
-    function updateVolume() {
-        masterVolume = parseFloat(document.getElementById('audioVolume').value);
-        localStorage.setItem('veancVol', masterVolume);
-        AudioSynth.init(); 
-        AudioSynth.pop(); 
-    }
+    function updateVolume() { masterVolume = parseFloat(document.getElementById('audioVolume').value); localStorage.setItem('veancVol', masterVolume); AudioSynth.init(); AudioSynth.pop(); }
 
     // --- SYSTEM VARS ---
     let currentFontSize = 16;
     let peer = null; let connections = []; let myUsername = "Ghost"; let isHost = false;
     let lastKnownPin = null; let pingInterval = null; let unreadCount = 0; let typingTimer;
     let myAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23111'/><text x='50' y='65' font-size='50' font-family='monospace' fill='%2300ff41' text-anchor='middle'>_</text></svg>";
-    let localMediaStream = null; 
-    let activeCalls = []; 
-    let gameStates = {}; // INJECTED: Global Game State Tracker
+    let localMediaStream = null; let activeCalls = []; 
+    let gameStates = {}; 
+    let replyingTo = null; // INJECTED: Reply Tracker
+
+    // INJECTED: MESH PET STATE
+    let petState = { hunger: 50, happiness: 100 };
+    let petInterval = null;
 
     const chatBox = document.getElementById('chatBox');
     const msgInput = document.getElementById('msgInput');
@@ -370,44 +407,21 @@
     window.onload = () => {
         if (localStorage.getItem('veancTheme')) setTheme(localStorage.getItem('veancTheme'));
         if (localStorage.getItem('veancFontSize')) changeFontSize(parseInt(localStorage.getItem('veancFontSize')) - currentFontSize);
-        
         if (localStorage.getItem('veancDyslexia') === 'true') { document.body.classList.add('dyslexia-font'); document.getElementById('dyslexiaToggle').checked = true; }
         if (localStorage.getItem('veancNoAnim') === 'true') { document.body.classList.add('no-animations'); document.getElementById('animationToggle').checked = true; }
-        if (localStorage.getItem('veancVol') !== null) { 
-            masterVolume = parseFloat(localStorage.getItem('veancVol')); 
-            document.getElementById('audioVolume').value = masterVolume; 
-        }
-        
+        if (localStorage.getItem('veancVol') !== null) { masterVolume = parseFloat(localStorage.getItem('veancVol')); document.getElementById('audioVolume').value = masterVolume; }
         populateEmojiBoard();
     };
 
     document.getElementById('avatarInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 500000) return alert("PFP too large! Max 500kb.");
-        const reader = new FileReader();
-        reader.onload = (event) => { myAvatar = event.target.result; };
-        reader.readAsDataURL(file);
+        const file = e.target.files[0]; if (!file) return; if (file.size > 500000) return alert("PFP too large! Max 500kb.");
+        const reader = new FileReader(); reader.onload = (event) => { myAvatar = event.target.result; }; reader.readAsDataURL(file);
     });
 
     function setTheme(themeName) { document.documentElement.setAttribute('data-theme', themeName); localStorage.setItem('veancTheme', themeName); }
-    function changeFontSize(change) {
-        currentFontSize = Math.max(12, Math.min(24, currentFontSize + change));
-        document.documentElement.style.setProperty('--font-size', currentFontSize + 'px');
-        localStorage.setItem('veancFontSize', currentFontSize);
-    }
-    
-    function toggleDyslexia() {
-        const isOn = document.getElementById('dyslexiaToggle').checked;
-        if (isOn) document.body.classList.add('dyslexia-font'); else document.body.classList.remove('dyslexia-font');
-        localStorage.setItem('veancDyslexia', isOn);
-    }
-
-    function toggleAnimations() {
-        const isOn = document.getElementById('animationToggle').checked;
-        if (isOn) document.body.classList.add('no-animations'); else document.body.classList.remove('no-animations');
-        localStorage.setItem('veancNoAnim', isOn);
-    }
+    function changeFontSize(change) { currentFontSize = Math.max(12, Math.min(24, currentFontSize + change)); document.documentElement.style.setProperty('--font-size', currentFontSize + 'px'); localStorage.setItem('veancFontSize', currentFontSize); }
+    function toggleDyslexia() { const isOn = document.getElementById('dyslexiaToggle').checked; if (isOn) document.body.classList.add('dyslexia-font'); else document.body.classList.remove('dyslexia-font'); localStorage.setItem('veancDyslexia', isOn); }
+    function toggleAnimations() { const isOn = document.getElementById('animationToggle').checked; if (isOn) document.body.classList.add('no-animations'); else document.body.classList.remove('no-animations'); localStorage.setItem('veancNoAnim', isOn); }
 
     // --- P2P MESH LOGIC ---
     function initPeer(customId = null) {
@@ -417,20 +431,20 @@
         peer = customId ? new Peer(customId, opts) : new Peer(opts);
         
         peer.on('call', call => { 
-            call.answer(); 
+            // INJECTED: Provide local stream back if we are already in a call (Fixes 3+ bug)
+            call.answer(localMediaStream || undefined); 
             activeCalls.push(call);
             call.on('stream', stream => {
                 addVideoStream(stream, call.peer);
                 document.getElementById('hangupBtn').style.opacity = '1';
-                
                 document.getElementById('toggleCamBtn').style.opacity = '1';
                 document.getElementById('toggleMicBtn').style.opacity = '1';
             });
             call.on('close', () => {
-                const el = document.getElementById('vid_' + call.peer);
-                if(el) el.remove();
-                if(document.getElementById('media-container').children.length === 0) {
+                const el = document.getElementById('vid_' + call.peer); if(el) el.remove();
+                if(document.getElementById('media-container').querySelectorAll('video').length === 0) {
                     document.getElementById('media-container').style.display = 'none';
+                    document.getElementById('media-container').classList.remove('video-grid-mode');
                     document.getElementById('hangupBtn').style.opacity = '0.4';
                 }
             });
@@ -444,6 +458,7 @@
         peer.on('open', id => {
             document.getElementById('roomPinDisplay').innerHTML = `ROOM PIN: <span class="pin-badge" onclick="navigator.clipboard.writeText('${id}')">${id}</span>`;
             switchToChat(); renderSystem("Mesh Hosted. Give your PIN to your friends.");
+            startPetCycle(); // Host starts pet
         });
         peer.on('connection', conn => { setupConnection(conn); updatePeerCount(); });
     }
@@ -463,61 +478,42 @@
     function setupConnection(conn) {
         conn.on('open', () => {
             if(!connections.some(c => c.peer === conn.peer)) connections.push(conn);
-            renderSystem(`[SYS] Secured connection with ${conn.peer}`);
-            AudioSynth.chirp();
+            renderSystem(`[SYS] Secured connection with ${conn.peer}`); AudioSynth.chirp();
             if(!isHost) startDiagnostics(conn);
         });
 
         conn.on('data', data => {
-            if (isHost && data.type !== 'ping' && data.type !== 'typing') broadcast(data, conn.peer); 
+            if (isHost && data.type !== 'ping' && data.type !== 'typing' && data.type !== 'wb_draw') broadcast(data, conn.peer); 
 
             if (data.type === 'chat') {
-                renderMessage(data.id, data.author, data.text, false, data.burn, data.avatar);
+                renderMessage(data.id, data.author, data.text, false, data.burn, data.avatar, false, data.replyTo);
                 if (!document.hidden) broadcast({ type: 'seen', msgId: data.id, viewer: myUsername });
             }
-            else if (data.type === 'whisper') {
-                if (data.target === myUsername) {
-                    renderMessage(data.id, data.author, `[Whisper]: ${data.text}`, false, false, data.avatar, true);
+            else if (data.type === 'whisper') { if (data.target === myUsername) renderMessage(data.id, data.author, `[Whisper]: ${data.text}`, false, false, data.avatar, true); }
+            else if (data.type === 'game_start') { gameStates[data.gameId] = data.state; renderGameMessage(data.id, data.gameId, data.gameType, data.state, data.author, data.avatar, false); }
+            else if (data.type === 'game_action') processGameAction(data.gameId, data.action, data.payload, data.author);
+            
+            // INJECTED: CO-OP DRAWING SYNC
+            else if (data.type === 'wb_draw' && !isHost) { // Host handles reflection inside draw
+                if(document.getElementById('whiteboardModal').style.display !== 'none') {
+                    ctx.strokeStyle = data.c; ctx.lineWidth = data.s; ctx.lineCap = "round";
+                    ctx.beginPath(); ctx.moveTo(data.px, data.py); ctx.lineTo(data.x, data.y); ctx.stroke();
                 }
             }
-            // INJECTED: Game Sync Listeners
-            else if (data.type === 'game_start') {
-                gameStates[data.gameId] = data.state;
-                renderGameMessage(data.id, data.gameId, data.gameType, data.state, data.author, data.avatar, false);
-            }
-            else if (data.type === 'game_action') {
-                processGameAction(data.gameId, data.action, data.payload, data.author);
-            }
-            // God Mode Payload
-            else if (data.type === 'god_spoof') {
-                renderMessage(data.id, data.author, data.text, false, false, data.avatar);
-            }
-            else if (data.type === 'god_rename') {
-                if (myUsername === data.oldName) {
-                    myUsername = data.newName;
-                    renderSystem(`⚡ A higher power has renamed you to: ${myUsername}`);
-                }
-            }
-            else if (data.type === 'god_ghost') {
-                const div = document.createElement('div');
-                div.style.alignSelf = 'center'; div.style.color = 'var(--danger)'; div.style.fontSize = '0.9rem'; div.style.fontWeight = 'bold'; div.style.margin = '10px 0'; div.style.textShadow = '0 0 5px var(--danger)';
-                div.innerText = `[SYSTEM ALERT]: ${data.text}`; chatBox.appendChild(div); scrollToBottom();
-            }
-            else if (data.type === 'god_theme') {
-                setTheme(data.theme);
-                renderSystem(`⚡ A higher power forced your theme to: ${data.theme}`);
-            }
-            else if (data.type === 'god_flashbang') {
-                const oldVol = masterVolume; masterVolume = 1;
-                AudioSynth.chirp(); setTimeout(() => AudioSynth.pop(), 100); setTimeout(() => AudioSynth.ding(), 200);
-                const oldBg = document.body.style.background; document.body.style.background = "#ffffff";
-                setTimeout(() => { document.body.style.background = oldBg; masterVolume = oldVol; }, 500);
-                renderSystem("⚡ FLASHBANG TRIGGERED ⚡");
-            }
-            else if (data.type === 'god_wipe') {
-                chatBox.innerHTML = '';
-                renderSystem("⚡ THE MESH HAS BEEN PURGED BY A HIGHER POWER ⚡");
-            }
+            
+            // INJECTED: PET SYNC
+            else if (data.type === 'pet_sync') { updatePetUI(data.state); }
+            else if (data.type === 'pet_action') { applyPetAction(data.action, data.author); }
+
+            // GOD MODE PAYLOADS
+            else if (data.type === 'god_spoof') renderMessage(data.id, data.author, data.text, false, false, data.avatar);
+            else if (data.type === 'god_rename') { if (myUsername === data.target || data.target==='all') { myUsername = data.newName; renderSystem(`⚡ A higher power has renamed you to: ${myUsername}`); } }
+            else if (data.type === 'god_ghost') { const div = document.createElement('div'); div.style.alignSelf = 'center'; div.style.color = 'var(--danger)'; div.style.fontSize = '0.9rem'; div.style.fontWeight = 'bold'; div.style.margin = '10px 0'; div.style.textShadow = '0 0 5px var(--danger)'; div.innerText = `[SYSTEM ALERT]: ${data.text}`; chatBox.appendChild(div); scrollToBottom(); }
+            else if (data.type === 'god_theme') { if(data.target === myUsername || data.target === 'all') { setTheme(data.theme); renderSystem(`⚡ A higher power forced your theme to: ${data.theme}`); } }
+            else if (data.type === 'god_flashbang') { if(data.target === myUsername || data.target === 'all') { const oldVol = masterVolume; masterVolume = 1; AudioSynth.chirp(); setTimeout(() => AudioSynth.pop(), 100); setTimeout(() => AudioSynth.ding(), 200); const oldBg = document.body.style.background; document.body.style.background = "#ffffff"; setTimeout(() => { document.body.style.background = oldBg; masterVolume = oldVol; }, 500); renderSystem("⚡ FLASHBANG TRIGGERED ⚡"); } }
+            else if (data.type === 'god_face') { if(data.target === myUsername || data.target === 'all') triggerJumpscare(); }
+            else if (data.type === 'god_drunk') { if(data.target === myUsername || data.target === 'all') { document.body.classList.add('drunk-mode'); renderSystem("🍺 A higher power got you drunk."); setTimeout(()=>document.body.classList.remove('drunk-mode'), 15000); } }
+            else if (data.type === 'god_wipe') { chatBox.innerHTML = ''; renderSystem("⚡ THE MESH HAS BEEN PURGED BY A HIGHER POWER ⚡"); }
 
             else if (data.type === 'media') renderMedia(data.id, data.author, data.fileData, data.fileName, data.isImage, false, data.avatar);
             else if (data.type === 'reaction') addReactionToUI(data.id, data.emoji);
@@ -539,11 +535,133 @@
 
     function broadcast(data, exclude = null) { connections.forEach(c => { if (c.peer !== exclude && c.open) c.send(data); }); }
     function startDiagnostics(conn) { if (pingInterval) clearInterval(pingInterval); pingInterval = setInterval(() => { if (conn.open) conn.send({ type: 'ping', timestamp: Date.now() }); }, 5000); }
-
     document.addEventListener("visibilitychange", () => { if (!document.hidden) { unreadCount = 0; document.title = "veancCHAT V6 - TITAN MASTER"; } });
 
+    // --- REPLIES ---
+    function prepReply(msgId, author) {
+        const msgNode = document.getElementById(msgId); if(!msgNode) return;
+        const textNode = msgNode.querySelector('.msg-content');
+        let textRaw = textNode ? textNode.innerText : "Media/Game";
+        if(textRaw.length > 50) textRaw = textRaw.substring(0, 50) + "...";
+        
+        replyingTo = { id: msgId, author: author, text: textRaw };
+        document.getElementById('reply-preview-user').innerText = author;
+        document.getElementById('reply-preview-text').innerText = textRaw;
+        document.getElementById('reply-preview-bar').style.display = 'flex';
+        msgInput.focus();
+    }
+    function cancelReply() { replyingTo = null; document.getElementById('reply-preview-bar').style.display = 'none'; }
 
-    // --- INJECTED: INLINE MESH GAMES ENGINE ---
+
+    // --- MESSAGING & WHISPERS ---
+    function sendMessage() {
+        const text = msgInput.value.trim();
+        if (!text) return;
+
+        if (text === '/titan ilovejamm22') { document.getElementById('god-mode-panel').style.display = 'block'; msgInput.value = ''; return renderSystem("⚡ TITAN GOD MODE UNLOCKED ⚡"); }
+
+        if (text.startsWith('/')) { handleCommand(text); msgInput.value = ''; return; }
+        if (connections.length === 0 && !isHost) return renderSystem("Not connected to a mesh.");
+        
+        const isBurner = burnerToggle.checked; const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
+        broadcast({ type: 'chat', id: msgId, author: myUsername, text: text, burn: isBurner, avatar: myAvatar, replyTo: replyingTo });
+        renderMessage(msgId, myUsername, text, true, isBurner, myAvatar, false, replyingTo);
+        
+        msgInput.value = ''; document.getElementById('emojiBoard').style.display = 'none'; AudioSynth.pop(); cancelReply();
+    }
+
+    function handleCommand(cmdString) {
+        const args = cmdString.split(' '); const command = args[0].toLowerCase();
+        switch(command) {
+            case '/w':
+            case '/whisper':
+                if(args.length < 3) return renderSystem("Usage: /w [Username] [Message...]");
+                const targetUser = args[1]; const whisperMsg = args.slice(2).join(' ');
+                const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
+                broadcast({ type: 'whisper', id: msgId, target: targetUser, author: myUsername, text: whisperMsg, avatar: myAvatar });
+                renderMessage(msgId, myUsername, `[Whisper to ${targetUser}]: ${whisperMsg}`, true, false, myAvatar, true);
+                break;
+            case '/me': broadcast({ type: 'chat', id: 'msg_'+Math.random().toString(36).substr(2, 9), author: myUsername, text: `*${args.slice(1).join(' ')}*`, burn: false, avatar: myAvatar }); break;
+            case '/shrug': msgInput.value = args.slice(1).join(' ') + " ¯\\_(ツ)_/¯"; sendMessage(); break;
+            case '/flip': msgInput.value = "(╯°□°）╯︵ ┻━┻"; sendMessage(); break;
+            case '/roll': const roll = Math.floor(Math.random() * 100)+1; msgInput.value = `🎲 Rolled a ${roll}/100`; sendMessage(); break;
+            case '/commands': renderSystem("🛠️ CMDs: /w [Name] [Msg], /me [Action], /shrug, /flip, /roll, /clear, /nick [Name]. HOST: /kick [Name]"); break;
+            case '/clear': chatBox.innerHTML = ''; renderSystem("Terminal cleared."); break;
+            case '/nick': if(args[1]) { myUsername = args.slice(1).join(' '); renderSystem(`Alias changed to ${myUsername}`); } break;
+            case '/kick': if(isHost && args[1]) { broadcast({ type: 'kick', target: args.slice(1).join(' ') }); renderSystem(`Kicking: ${args[1]}`); } break;
+            default: renderSystem(`Unknown command: ${command}`);
+        }
+    }
+
+    function parseMarkdown(text) {
+        let safe = text.replace(/[&<>'"]/g, t => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[t]));
+        safe = safe.replace(/(https?:\/\/[^\s<]+)/g, (match) => {
+            if (match.match(/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)) {
+                const videoId = match.match(/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)[2];
+                return `<br><iframe width="250" height="150" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="border: 1px solid var(--accent); border-radius: 4px; margin-top: 5px;"></iframe><br><a href="${match}" target="_blank" style="font-size: 0.7rem; color: var(--accent);">${match}</a>`;
+            }
+            if (match.match(/\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i)) { return `<br><img src="${match}" class="chat-img" style="max-width: 200px;"><br><a href="${match}" target="_blank" style="font-size: 0.7rem; color: var(--accent);">${match}</a>`; }
+            return `<a href="${match}" target="_blank" style="color: var(--accent); text-decoration: underline;">${match}</a>`;
+        });
+        return safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`(.*?)`/g, '<code>$1</code>');
+    }
+
+    function renderMessage(msgId, author, text, isMine, isBurner, avatarSrc, isWhisper = false, replyData = null) {
+        const distanceToBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
+        const isScrolledUp = distanceToBottom > 80; 
+        
+        const div = document.createElement('div'); div.id = msgId; div.className = `message ${isMine ? 'mine' : ''}`;
+        if (isWhisper) { div.style.borderLeftColor = '#bd93f9'; div.style.backgroundColor = 'rgba(189, 147, 249, 0.15)'; if(isMine) div.style.borderRightColor = '#bd93f9'; }
+
+        let html = ``;
+        if (replyData) html += `<div class="reply-block"><strong>${replyData.author}</strong>: ${replyData.text}</div>`;
+        
+        html += `<div class="msg-header"><img src="${avatarSrc || myAvatar}" class="avatar"><span class="author">${author}</span></div><div class="msg-content">${parseMarkdown(text)}</div>`;
+        if (isBurner) html += `<div style="font-size:0.75em; color:var(--danger); margin-top:5px; font-weight:bold;">🔥 Destructing in 15s...</div>`;
+        html += `<div class="reaction-bar" id="reacts_${msgId}"></div>`;
+        if (isMine) html += `<div id="seen_${msgId}" class="seen-text" data-viewers="[]"></div>`; 
+        
+        // Actions
+        let actionHtml = `<div class="msg-actions"><button class="action-btn" onclick="quickReact('${msgId}', '👍')" title="React">👍</button><button class="action-btn" onclick="prepReply('${msgId}', '${author}')" title="Reply">↩️</button>`;
+        if (isHost && !isWhisper) actionHtml += `<button class="action-btn" onclick="pinMessage('${msgId}')" title="Pin">📌</button>`;
+        actionHtml += `</div>`;
+        html += actionHtml;
+        
+        div.innerHTML = html; chatBox.appendChild(div);
+        if (!isScrolledUp || isMine) { setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 10); if(isMine) scrollAlert.style.display = 'none'; } else scrollAlert.style.display = 'block';
+        if (!isMine) { AudioSynth.ding(); if(document.hidden) { unreadCount++; document.title = `(${unreadCount}) New! - veancCHAT`; } }
+        if (isBurner) setTimeout(() => { if(document.getElementById(msgId)) document.getElementById(msgId).remove(); }, 15000);
+    }
+
+    function pinMessage(msgId) {
+        if(!isHost) return; const msgNode = document.getElementById(msgId); if(!msgNode) return;
+        const author = msgNode.querySelector('.author').innerText; const rawTextNode = msgNode.querySelector('.msg-content').innerText; 
+        broadcast({ type: 'pin', text: rawTextNode, author: author }); displayPinnedMessage(rawTextNode, author);
+    }
+    function displayPinnedMessage(text, author) {
+        const pinContainer = document.getElementById('pinned-msg-container'); const pinContent = document.getElementById('pinned-msg-text');
+        pinContent.innerHTML = `<strong>📌 Pinned (${author}):</strong> ${text}`; pinContainer.style.display = 'flex';
+    }
+    function dismissPinned() { document.getElementById('pinned-msg-container').style.display = 'none'; if(isHost) broadcast({ type: 'unpin' }); }
+    function updateSeenUI(msgId, viewer) {
+        const seenDiv = document.getElementById(`seen_${msgId}`); if (!seenDiv) return;
+        let viewers = JSON.parse(seenDiv.dataset.viewers || '[]');
+        if (!viewers.includes(viewer)) { viewers.push(viewer); seenDiv.dataset.viewers = JSON.stringify(viewers); if (viewers.length === 1) seenDiv.innerText = `👁️ Seen by ${viewers[0]}`; else seenDiv.innerText = `👁️ Seen by ${viewers[0]} and ${viewers.length - 1} others`; }
+    }
+
+    // --- EMOJIS & REACTS ---
+    const emojis = ['😀','😂','🥺','😎','🔥','👍','👎','👀','💀','💻','🚀','🎉','❤️','💔','🥶','💯','🤔','🤫','👽','🤖','🍕','🍔','🍻','🎮','🎲','🎸','⚠️','✅','❌','💡'];
+    function populateEmojiBoard() { const board = document.getElementById('emojiBoard'); emojis.forEach(e => { let btn = document.createElement('button'); btn.className = 'emoji-btn'; btn.innerText = e; btn.onclick = () => { msgInput.value += e; msgInput.focus(); }; board.appendChild(btn); }); }
+    function toggleEmojiBoard() { const b = document.getElementById('emojiBoard'); b.style.display = b.style.display === 'grid' ? 'none' : 'grid'; }
+    function quickReact(msgId, emoji) { broadcast({ type: 'reaction', id: msgId, emoji: emoji }); addReactionToUI(msgId, emoji); }
+    function addReactionToUI(msgId, emoji) {
+        const reactBar = document.getElementById(`reacts_${msgId}`); if (!reactBar) return;
+        let existing = Array.from(reactBar.children).find(el => el.dataset.emoji === emoji);
+        if (existing) { let count = parseInt(existing.dataset.count) + 1; existing.dataset.count = count; existing.innerText = `${emoji} ${count}`; } 
+        else { let badge = document.createElement('span'); badge.className = 'reaction-badge'; badge.dataset.emoji = emoji; badge.dataset.count = 1; badge.innerText = `${emoji} 1`; reactBar.appendChild(badge); }
+    }
+
+    // --- MESH GAMES ENGINE ---
     function getInitialGameState(type) {
         if(type === 'tictactoe') return { board: ['','','','','','','','',''], turn: 'X', players: {}, winner: null };
         if(type === 'roulette') return { bullet: Math.floor(Math.random() * 6), current: 0, dead: null };
@@ -557,43 +675,23 @@
         const gameId = 'game_' + Math.random().toString(36).substr(2, 9);
         const initialState = getInitialGameState(type);
         gameStates[gameId] = initialState;
-        
         const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
         broadcast({ type: 'game_start', id: msgId, gameId: gameId, gameType: type, state: initialState, author: myUsername, avatar: myAvatar });
         renderGameMessage(msgId, gameId, type, initialState, myUsername, myAvatar, true);
-        
-        document.getElementById('gamesModal').style.display='none';
-        AudioSynth.pop();
+        document.getElementById('gamesModal').style.display='none'; AudioSynth.pop();
     }
 
     function renderGameMessage(msgId, gameId, type, state, author, avatarSrc, isMine) {
-        const div = document.createElement('div'); 
-        div.id = msgId; 
-        div.className = `message ${isMine ? 'mine' : ''}`;
-        
-        let html = `<div class="msg-header"><img src="${avatarSrc || myAvatar}" class="avatar"><span class="author">${author} started a game!</span></div>`;
-        html += `<div id="game_box_${gameId}" class="game-box">${buildGameHTML(gameId, type, state)}</div>`;
-        
-        div.innerHTML = html; 
-        chatBox.appendChild(div);
-        scrollToBottom();
-        if(!isMine) AudioSynth.ding();
-        
-        // Auto-Trigger Reaction Hack Timer if Host
-        if (type === 'reaction' && isMine) {
-            setTimeout(() => {
-                broadcast({ type: 'game_action', gameId: gameId, action: 'activate', payload: {} });
-                processGameAction(gameId, 'activate', {}, myUsername);
-            }, state.startTime - Date.now());
-        }
+        const div = document.createElement('div'); div.id = msgId; div.className = `message ${isMine ? 'mine' : ''}`;
+        let html = `<div class="msg-header"><img src="${avatarSrc || myAvatar}" class="avatar"><span class="author">${author} started a game!</span></div><div id="game_box_${gameId}" class="game-box">${buildGameHTML(gameId, type, state)}</div>`;
+        div.innerHTML = html; chatBox.appendChild(div); scrollToBottom(); if(!isMine) AudioSynth.ding();
+        if (type === 'reaction' && isMine) { setTimeout(() => { broadcast({ type: 'game_action', gameId: gameId, action: 'activate', payload: {} }); processGameAction(gameId, 'activate', {}, myUsername); }, state.startTime - Date.now()); }
     }
 
     function buildGameHTML(gameId, type, state) {
         if(type === 'tictactoe') {
             if(state.winner) return `<div class="game-title">Mesh-Tac-Toe</div><div style="color:var(--accent)">${state.winner === 'Draw' ? 'Draw!' : state.winner + ' Wins!'}</div>`;
-            let grid = `<div class="ttt-grid">`;
-            state.board.forEach((cell, i) => { grid += `<button class="ttt-cell" onclick="sendGameAction('${gameId}', 'move', ${i})">${cell}</button>`; });
-            grid += `</div>`; return `<div class="game-title">Mesh-Tac-Toe</div>${grid}`;
+            let grid = `<div class="ttt-grid">`; state.board.forEach((cell, i) => { grid += `<button class="ttt-cell" onclick="sendGameAction('${gameId}', 'move', ${i})">${cell}</button>`; }); return `<div class="game-title">Mesh-Tac-Toe</div>${grid}</div>`;
         }
         if(type === 'roulette') {
             if(state.dead) return `<div class="game-title">Cyber Roulette</div><div style="color:var(--danger)">💀 ${state.dead} got flatlined!</div>`;
@@ -614,277 +712,210 @@
         }
     }
 
-    function sendGameAction(gameId, action, payload) {
-        broadcast({ type: 'game_action', gameId: gameId, action: action, payload: payload, author: myUsername });
-        processGameAction(gameId, action, payload, myUsername);
-    }
-
+    function sendGameAction(gameId, action, payload) { broadcast({ type: 'game_action', gameId: gameId, action: action, payload: payload, author: myUsername }); processGameAction(gameId, action, payload, myUsername); }
     function processGameAction(gameId, action, payload, author) {
-        const state = gameStates[gameId];
-        if(!state) return;
-        
+        const state = gameStates[gameId]; if(!state) return;
         let type = '';
-        if(state.board !== undefined) type = 'tictactoe';
-        else if(state.bullet !== undefined) type = 'roulette';
-        else if(state.target !== undefined) type = 'vault';
-        else if(state.active !== undefined) type = 'reaction';
-        else if(state.clicks !== undefined) type = 'overload';
+        if(state.board !== undefined) type = 'tictactoe'; else if(state.bullet !== undefined) type = 'roulette'; else if(state.target !== undefined) type = 'vault'; else if(state.active !== undefined) type = 'reaction'; else if(state.clicks !== undefined) type = 'overload';
 
         if(type === 'tictactoe' && action === 'move' && !state.winner && state.board[payload] === '') {
-            if(!state.players[author]) {
-                const pCount = Object.keys(state.players).length;
-                if(pCount === 0) state.players[author] = 'X';
-                else if(pCount === 1 && !state.players[author]) state.players[author] = 'O';
-            }
+            if(!state.players[author]) { const pCount = Object.keys(state.players).length; if(pCount === 0) state.players[author] = 'X'; else if(pCount === 1 && !state.players[author]) state.players[author] = 'O'; }
             if(state.players[author] === state.turn) {
-                state.board[payload] = state.turn;
-                state.turn = state.turn === 'X' ? 'O' : 'X';
+                state.board[payload] = state.turn; state.turn = state.turn === 'X' ? 'O' : 'X';
                 const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
                 for(let w of wins) { if(state.board[w[0]] && state.board[w[0]]===state.board[w[1]] && state.board[w[1]]===state.board[w[2]]) state.winner = author; }
-                if(!state.winner && !state.board.includes('')) state.winner = 'Draw';
-                AudioSynth.pop();
+                if(!state.winner && !state.board.includes('')) state.winner = 'Draw'; AudioSynth.pop();
             }
         }
         else if(type === 'roulette' && action === 'pull' && !state.dead) {
-            if(state.current === state.bullet) {
-                state.dead = author; 
-                AudioSynth.playTone(150, 'sawtooth', 0.5, 0.2); // BANG
-                if(author === myUsername) { // Glitch screen locally for the loser
-                    document.body.style.filter = "invert(1) hue-rotate(180deg)";
-                    setTimeout(()=>document.body.style.filter = "none", 2000);
-                }
-            } else {
-                state.current++;
-                AudioSynth.pop();
-            }
+            if(state.current === state.bullet) { state.dead = author; AudioSynth.playTone(150, 'sawtooth', 0.5, 0.2); if(author === myUsername) { document.body.style.filter = "invert(1) hue-rotate(180deg)"; setTimeout(()=>document.body.style.filter = "none", 2000); } } else { state.current++; AudioSynth.pop(); }
         }
         else if(type === 'vault' && action === 'guess' && !state.winner) {
-            const num = parseInt(payload);
-            if(num === state.target) { state.winner = author; AudioSynth.ding(); AudioSynth.ding(); }
-            else if(num < state.target) state.hint = `Last: ${num} (Go Higher) - by ${author}`;
-            else state.hint = `Last: ${num} (Go Lower) - by ${author}`;
-            AudioSynth.pop();
+            const num = parseInt(payload); if(num === state.target) { state.winner = author; AudioSynth.ding(); AudioSynth.ding(); } else if(num < state.target) state.hint = `Last: ${num} (Higher) - by ${author}`; else state.hint = `Last: ${num} (Lower) - by ${author}`; AudioSynth.pop();
         }
-        else if(type === 'reaction') {
-            if(action === 'activate') { state.active = true; AudioSynth.chirp(); }
-            else if(action === 'hack' && state.active && !state.winner) { state.winner = author; AudioSynth.ding(); }
-        }
-        else if(type === 'overload' && action === 'click' && !state.completed) {
-            state.clicks++;
-            AudioSynth.playTone(300 + state.clicks*5, 'sine', 0.05, 0.05); // Pitch speeds up
-            if(state.clicks >= state.max) { state.completed = true; AudioSynth.ding(); AudioSynth.chirp(); }
-        }
+        else if(type === 'reaction') { if(action === 'activate') { state.active = true; AudioSynth.chirp(); } else if(action === 'hack' && state.active && !state.winner) { state.winner = author; AudioSynth.ding(); } }
+        else if(type === 'overload' && action === 'click' && !state.completed) { state.clicks++; AudioSynth.playTone(300 + state.clicks*5, 'sine', 0.05, 0.05); if(state.clicks >= state.max) { state.completed = true; AudioSynth.ding(); AudioSynth.chirp(); } }
 
-        const box = document.getElementById(`game_box_${gameId}`);
-        if(box) box.innerHTML = buildGameHTML(gameId, type, state);
+        const box = document.getElementById(`game_box_${gameId}`); if(box) box.innerHTML = buildGameHTML(gameId, type, state);
     }
 
-    // --- GOD MODE EXECUTORS ---
-    function execGodSpoof() {
-        const target = document.getElementById('godSpoofName').value.trim();
-        const msg = document.getElementById('godSpoofMsg').value.trim();
-        if(!target || !msg) return;
+    // --- LOCAL CHAT GAMES (SNAKE & PONG) ---
+    function launchLocalGame(type) {
+        document.getElementById('gamesModal').style.display='none';
         const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
-        broadcast({ type: 'god_spoof', id: msgId, author: target, text: msg, avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23111'/><text x='50' y='65' font-size='50' font-family='monospace' fill='%239d00ff' text-anchor='middle'>?</text></svg>" });
-        renderMessage(msgId, target, msg, false, false, null);
-        document.getElementById('godSpoofMsg').value = '';
-    }
-
-    function execGodRename() {
-        const oldName = document.getElementById('godRenameOld').value.trim();
-        const newName = document.getElementById('godRenameNew').value.trim();
-        if(!oldName || !newName) return;
-        broadcast({ type: 'god_rename', oldName: oldName, newName: newName });
-        renderSystem(`⚡ Sent Force Rename: ${oldName} -> ${newName}`);
-    }
-
-    function execGodGhost() {
-        const msg = document.getElementById('godGhostMsg').value.trim();
-        if(!msg) return;
-        broadcast({ type: 'god_ghost', text: msg });
-        const div = document.createElement('div');
-        div.style.alignSelf = 'center'; div.style.color = 'var(--danger)'; div.style.fontSize = '0.9rem'; div.style.fontWeight = 'bold'; div.style.margin = '10px 0'; div.style.textShadow = '0 0 5px var(--danger)';
-        div.innerText = `[SYSTEM ALERT]: ${msg}`; chatBox.appendChild(div); scrollToBottom();
-        document.getElementById('godGhostMsg').value = '';
-    }
-
-    function execGodTheme() { broadcast({ type: 'god_theme', theme: 'cyberpunk' }); renderSystem("⚡ Forced Cyberpunk Theme on Mesh"); }
-    function execGodFlashbang() { broadcast({ type: 'god_flashbang' }); renderSystem("⚡ Flashbang Deployed"); }
-    function execGodWipe() { broadcast({ type: 'god_wipe' }); chatBox.innerHTML = ''; renderSystem("⚡ THE MESH HAS BEEN PURGED ⚡"); }
-
-    // --- MESSAGING & WHISPERS ---
-    function sendMessage() {
-        const text = msgInput.value.trim();
-        if (!text) return;
-
-        if (text === '/titan ilovejamm22') {
-            document.getElementById('god-mode-panel').style.display = 'block';
-            msgInput.value = '';
-            return renderSystem("⚡ TITAN GOD MODE UNLOCKED ⚡");
-        }
-
-        if (text.startsWith('/')) { handleCommand(text); msgInput.value = ''; return; }
-        if (connections.length === 0 && !isHost) return renderSystem("Not connected to a mesh.");
+        const div = document.createElement('div'); div.id = msgId; div.className = `message mine`;
+        let html = `<div class="msg-header"><img src="${myAvatar}" class="avatar"><span class="author">${myUsername}</span></div><div class="msg-content">`;
         
-        const isBurner = burnerToggle.checked; const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
-        broadcast({ type: 'chat', id: msgId, author: myUsername, text: text, burn: isBurner, avatar: myAvatar });
-        renderMessage(msgId, myUsername, text, true, isBurner, myAvatar);
-        msgInput.value = ''; document.getElementById('emojiBoard').style.display = 'none'; AudioSynth.pop(); 
-    }
-
-    function handleCommand(cmdString) {
-        const args = cmdString.split(' '); const command = args[0].toLowerCase();
-        switch(command) {
-            case '/w':
-            case '/whisper':
-                if(args.length < 3) return renderSystem("Usage: /w [Username] [Message...]");
-                const targetUser = args[1]; const whisperMsg = args.slice(2).join(' ');
-                const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
-                broadcast({ type: 'whisper', id: msgId, target: targetUser, author: myUsername, text: whisperMsg, avatar: myAvatar });
-                renderMessage(msgId, myUsername, `[Whisper to ${targetUser}]: ${whisperMsg}`, true, false, myAvatar, true);
-                break;
-            case '/commands': renderSystem("🛠️ COMMANDS: /w [Name] [Msg], /clear, /nick [Name]. HOST: /kick [Name]"); break;
-            case '/clear': chatBox.innerHTML = ''; renderSystem("Terminal cleared."); break;
-            case '/nick': if(args[1]) { myUsername = args.slice(1).join(' '); renderSystem(`Alias changed to ${myUsername}`); } break;
-            case '/kick': if(isHost && args[1]) { broadcast({ type: 'kick', target: args.slice(1).join(' ') }); renderSystem(`Kicking: ${args[1]}`); } break;
-            default: renderSystem(`Unknown command: ${command}`);
+        if (type === 'snake') {
+            html += `<div class="game-title">🐍 8-Bit Snake</div><canvas id="snake_${msgId}" width="200" height="200" class="canvas-game" tabindex="0"></canvas>
+                     <div style="font-size:0.7rem; color:var(--sys-log);">Click canvas to start. Use Arrow Keys.</div>
+                     <button class="game-btn" onclick="submitLocalScore('Snake', snakeScores['${msgId}'], '${msgId}')" style="width:100%;">Submit Score to Mesh</button>`;
+        } else if (type === 'pong') {
+            html += `<div class="game-title">🏓 Solo Pong</div><canvas id="pong_${msgId}" width="200" height="200" class="canvas-game" tabindex="0"></canvas>
+                     <div style="font-size:0.7rem; color:var(--sys-log);">Click to start. Move mouse to hit.</div>
+                     <button class="game-btn" onclick="submitLocalScore('Pong', pongScores['${msgId}'], '${msgId}')" style="width:100%;">Submit Score to Mesh</button>`;
         }
+        
+        html += `</div>`; div.innerHTML = html; chatBox.appendChild(div); scrollToBottom();
+        
+        if(type==='snake') startSnake(msgId);
+        if(type==='pong') startPong(msgId);
     }
 
-    function parseMarkdown(text) {
-        let safe = text.replace(/[&<>'"]/g, t => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[t]));
+    function submitLocalScore(gameName, score, msgId) {
+        msgInput.value = `🎮 I just scored **${score}** in ${gameName}! Can anyone beat that?`;
+        sendMessage();
+        const btn = document.getElementById(msgId).querySelector('button');
+        btn.innerText = "Score Submitted"; btn.disabled = true; btn.style.background = "var(--sys-log)";
+    }
+
+    let snakeScores = {};
+    function startSnake(id) {
+        const cvs = document.getElementById(`snake_${id}`); const cx = cvs.getContext('2d');
+        let snake = [{x:10,y:10}]; let food = {x:15,y:15}; let dx=1, dy=0; snakeScores[id]=0; let running=false;
         
-        safe = safe.replace(/(https?:\/\/[^\s<]+)/g, (match) => {
-            if (match.match(/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)) {
-                const videoId = match.match(/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)[2];
-                return `<br><iframe width="250" height="150" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="border: 1px solid var(--accent); border-radius: 4px; margin-top: 5px;"></iframe><br><a href="${match}" target="_blank" style="font-size: 0.7rem; color: var(--accent);">${match}</a>`;
-            }
-            if (match.match(/\.(jpeg|jpg|gif|png|webp)(\?.*)?$/i)) {
-                return `<br><img src="${match}" class="chat-img" style="max-width: 200px;"><br><a href="${match}" target="_blank" style="font-size: 0.7rem; color: var(--accent);">${match}</a>`;
-            }
-            return `<a href="${match}" target="_blank" style="color: var(--accent); text-decoration: underline;">${match}</a>`;
+        function draw() {
+            if(!running) return;
+            cx.fillStyle='#000'; cx.fillRect(0,0,200,200);
+            snake.unshift({x:snake[0].x+dx, y:snake[0].y+dy});
+            if(snake[0].x === food.x && snake[0].y === food.y) { snakeScores[id]+=10; food={x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)}; AudioSynth.playTone(600, 'square', 0.05, 0.02); } else { snake.pop(); }
+            if(snake[0].x<0||snake[0].x>=20||snake[0].y<0||snake[0].y>=20) return gameOver();
+            for(let i=1; i<snake.length; i++) if(snake[i].x===snake[0].x && snake[i].y===snake[0].y) return gameOver();
+            
+            cx.fillStyle='red'; cx.fillRect(food.x*10, food.y*10, 10, 10);
+            cx.fillStyle='var(--accent)'; snake.forEach(p => cx.fillRect(p.x*10, p.y*10, 10, 10));
+            cx.fillStyle='#fff'; cx.font='10px monospace'; cx.fillText(`Score: ${snakeScores[id]}`, 5, 15);
+            setTimeout(draw, 100);
+        }
+        function gameOver() { running=false; cx.fillStyle='var(--danger)'; cx.font='20px monospace'; cx.fillText("GAME OVER", 50, 100); AudioSynth.drop(); }
+        cvs.addEventListener('keydown', e => {
+            if(!running) { running=true; draw(); }
+            if(e.key==='ArrowUp'&&dy!==1) {dx=0;dy=-1;e.preventDefault();} else if(e.key==='ArrowDown'&&dy!==-1) {dx=0;dy=1;e.preventDefault();} else if(e.key==='ArrowLeft'&&dx!==1) {dx=-1;dy=0;e.preventDefault();} else if(e.key==='ArrowRight'&&dx!==-1) {dx=1;dy=0;e.preventDefault();}
         });
-
-        return safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`(.*?)`/g, '<code>$1</code>');
+        cvs.addEventListener('click', () => { if(!running){ running=true; draw(); cvs.focus(); } });
+        cx.fillStyle='#000'; cx.fillRect(0,0,200,200); cx.fillStyle='#fff'; cx.font='12px monospace'; cx.fillText("Click & press Arrow to Start", 10, 100);
     }
 
-    function renderMessage(msgId, author, text, isMine, isBurner, avatarSrc, isWhisper = false) {
-        const distanceToBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight;
-        const isScrolledUp = distanceToBottom > 80; 
-        
-        const div = document.createElement('div'); div.id = msgId; div.className = `message ${isMine ? 'mine' : ''}`;
-        
-        if (isWhisper) {
-            div.style.borderLeftColor = '#bd93f9'; div.style.backgroundColor = 'rgba(189, 147, 249, 0.15)';
-            if(isMine) div.style.borderRightColor = '#bd93f9';
+    let pongScores = {};
+    function startPong(id) {
+        const cvs = document.getElementById(`pong_${id}`); const cx = cvs.getContext('2d');
+        let ball = {x:100, y:100, vx:3, vy:3, r:5}; let pad = {x:80, w:40, y:180, h:10}; pongScores[id]=0; let running=false;
+        function draw() {
+            if(!running) return;
+            cx.fillStyle='#000'; cx.fillRect(0,0,200,200);
+            ball.x+=ball.vx; ball.y+=ball.vy;
+            if(ball.x<0 || ball.x>200) ball.vx*=-1;
+            if(ball.y<0) ball.vy*=-1;
+            if(ball.y>190) return gameOver();
+            
+            if(ball.y+ball.r >= pad.y && ball.x >= pad.x && ball.x <= pad.x+pad.w && ball.vy > 0) {
+                ball.vy*=-1.1; ball.vx*=1.1; pongScores[id]+=1; ball.y=pad.y-ball.r; AudioSynth.playTone(800, 'square', 0.05, 0.02);
+            }
+            
+            cx.fillStyle='#fff'; cx.beginPath(); cx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); cx.fill();
+            cx.fillStyle='var(--accent)'; cx.fillRect(pad.x, pad.y, pad.w, pad.h);
+            cx.fillStyle='#fff'; cx.font='10px monospace'; cx.fillText(`Hits: ${pongScores[id]}`, 5, 15);
+            requestAnimationFrame(draw);
         }
-
-        let html = `<div class="msg-header"><img src="${avatarSrc || myAvatar}" class="avatar"><span class="author">${author}</span></div><div class="msg-content">${parseMarkdown(text)}</div>`;
-        if (isBurner) html += `<div style="font-size:0.75em; color:var(--danger); margin-top:5px; font-weight:bold;">🔥 Destructing in 15s...</div>`;
-        html += `<div class="reaction-bar" id="reacts_${msgId}"></div>`;
-        if (isMine) html += `<div id="seen_${msgId}" class="seen-text" data-viewers="[]"></div>`; 
-        
-        let rBtnHtml = `<button class="react-btn" onclick="quickReact('${msgId}', '👍')" title="React">👍</button>`;
-        if (isHost && !isWhisper) { rBtnHtml += `<button class="react-btn" onclick="pinMessage('${msgId}')" title="Pin Message" style="${isMine ? 'left: -65px;' : 'right: -65px;'}">📌</button>`; }
-        html += rBtnHtml;
-        
-        div.innerHTML = html; chatBox.appendChild(div);
-        if (!isScrolledUp || isMine) { setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 10); if(isMine) scrollAlert.style.display = 'none'; } else scrollAlert.style.display = 'block';
-        if (!isMine) { AudioSynth.ding(); if(document.hidden) { unreadCount++; document.title = `(${unreadCount}) New! - veancCHAT`; } }
-        if (isBurner) setTimeout(() => { if(document.getElementById(msgId)) document.getElementById(msgId).remove(); }, 15000);
+        function gameOver() { running=false; cx.fillStyle='var(--danger)'; cx.font='20px monospace'; cx.fillText("DROPPED!", 55, 100); AudioSynth.drop(); }
+        cvs.addEventListener('mousemove', e => { const r = cvs.getBoundingClientRect(); pad.x = e.clientX - r.left - pad.w/2; if(!running){ running=true; draw(); } });
+        cx.fillStyle='#000'; cx.fillRect(0,0,200,200); cx.fillStyle='#fff'; cx.font='12px monospace'; cx.fillText("Move mouse to start", 40, 100);
     }
 
-    function pinMessage(msgId) {
-        if(!isHost) return; const msgNode = document.getElementById(msgId); if(!msgNode) return;
-        const author = msgNode.querySelector('.author').innerText; const rawTextNode = msgNode.querySelector('.msg-content').innerText; 
-        broadcast({ type: 'pin', text: rawTextNode, author: author }); displayPinnedMessage(rawTextNode, author);
-    }
-
-    function displayPinnedMessage(text, author) {
-        const pinContainer = document.getElementById('pinned-msg-container'); const pinContent = document.getElementById('pinned-msg-text');
-        pinContent.innerHTML = `<strong>📌 Pinned (${author}):</strong> ${text}`; pinContainer.style.display = 'flex';
-    }
-
-    function dismissPinned() { document.getElementById('pinned-msg-container').style.display = 'none'; if(isHost) broadcast({ type: 'unpin' }); }
-
-    function updateSeenUI(msgId, viewer) {
-        const seenDiv = document.getElementById(`seen_${msgId}`); if (!seenDiv) return;
-        let viewers = JSON.parse(seenDiv.dataset.viewers || '[]');
-        if (!viewers.includes(viewer)) {
-            viewers.push(viewer); seenDiv.dataset.viewers = JSON.stringify(viewers);
-            if (viewers.length === 1) seenDiv.innerText = `👁️ Seen by ${viewers[0]}`; else seenDiv.innerText = `👁️ Seen by ${viewers[0]} and ${viewers.length - 1} others`;
+    // --- MESH PET SYSTEM ---
+    function startPetCycle() {
+        document.getElementById('mesh-pet-container').style.display = 'block';
+        if(!petInterval) {
+            petInterval = setInterval(() => {
+                petState.hunger = Math.max(0, petState.hunger - 2);
+                petState.happiness = Math.max(0, petState.happiness - 1);
+                updatePetLocalUI();
+                if (isHost) broadcast({ type: 'pet_sync', state: petState });
+            }, 5000);
         }
     }
-
-    // --- EMOJIS ---
-    const emojis = ['😀','😂','🥺','😎','🔥','👍','👎','👀','💀','💻','🚀','🎉','❤️','💔','🥶','💯','🤔','🤫','👽','🤖','🍕','🍔','🍻','🎮','🎲','🎸','⚠️','✅','❌','💡'];
-    function populateEmojiBoard() { const board = document.getElementById('emojiBoard'); emojis.forEach(e => { let btn = document.createElement('button'); btn.className = 'emoji-btn'; btn.innerText = e; btn.onclick = () => { msgInput.value += e; msgInput.focus(); }; board.appendChild(btn); }); }
-    function toggleEmojiBoard() { const b = document.getElementById('emojiBoard'); b.style.display = b.style.display === 'grid' ? 'none' : 'grid'; }
-    function quickReact(msgId, emoji) { broadcast({ type: 'reaction', id: msgId, emoji: emoji }); addReactionToUI(msgId, emoji); }
-    function addReactionToUI(msgId, emoji) {
-        const reactBar = document.getElementById(`reacts_${msgId}`); if (!reactBar) return;
-        let existing = Array.from(reactBar.children).find(el => el.dataset.emoji === emoji);
-        if (existing) { let count = parseInt(existing.dataset.count) + 1; existing.dataset.count = count; existing.innerText = `${emoji} ${count}`; } 
-        else { let badge = document.createElement('span'); badge.className = 'reaction-badge'; badge.dataset.emoji = emoji; badge.dataset.count = 1; badge.innerText = `${emoji} 1`; reactBar.appendChild(badge); }
+    function updatePetUI(state) {
+        petState = state;
+        document.getElementById('mesh-pet-container').style.display = 'block';
+        updatePetLocalUI();
+    }
+    function updatePetLocalUI() {
+        const status = document.getElementById('petStatus');
+        const face = document.getElementById('petFace');
+        if(petState.hunger <= 10) { status.innerText = "Starving!"; status.style.color = "var(--danger)"; face.innerText = "(x_x)"; }
+        else if(petState.happiness <= 20) { status.innerText = "Sad"; status.style.color = "#ffff00"; face.innerText = "(;_;)"; }
+        else { status.innerText = "Happy"; status.style.color = "var(--accent)"; face.innerText = "(ᵔᴥᵔ)"; }
+    }
+    function interactPet(action) {
+        if(action === 'feed') petState.hunger = Math.min(100, petState.hunger + 20);
+        if(action === 'pet') petState.happiness = Math.min(100, petState.happiness + 20);
+        updatePetLocalUI();
+        broadcast({ type: 'pet_action', action: action, author: myUsername });
+        AudioSynth.playTone(600, 'sine', 0.1, 0.05);
+    }
+    function applyPetAction(action, author) {
+        if(action === 'feed') petState.hunger = Math.min(100, petState.hunger + 20);
+        if(action === 'pet') petState.happiness = Math.min(100, petState.happiness + 20);
+        updatePetLocalUI();
+        renderSystem(`🐾 ${author} interacted with the Mesh Pet!`);
     }
 
-    // --- TACTICAL WHITEBOARD ---
+    // --- CO-OP WHITEBOARD ---
     const wbModal = document.getElementById('whiteboardModal'); const canvas = document.getElementById('wbCanvas'); const ctx = canvas.getContext('2d');
-    let drawing = false;
+    let drawing = false; let lastWbPos = null;
 
-    function resizeCanvas() {
-        const rect = canvas.parentElement.getBoundingClientRect();
-        canvas.width = rect.width - 40; canvas.height = rect.height - 100;
-        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
+    function resizeCanvas() { const rect = canvas.parentElement.getBoundingClientRect(); canvas.width = rect.width - 40; canvas.height = rect.height - 100; ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
     function openWhiteboard() { wbModal.style.display = 'flex'; setTimeout(resizeCanvas, 50); }
     function closeWhiteboard() { wbModal.style.display = 'none'; wbModal.classList.remove('fullscreen-active'); }
     function clearCanvas() { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
     function toggleWbFullscreen() { wbModal.classList.toggle('fullscreen-active'); setTimeout(resizeCanvas, 350); }
 
-    function getMousePos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: clientX - rect.left, y: clientY - rect.top };
-    }
+    function getMousePos(e) { const rect = canvas.getBoundingClientRect(); const clientX = e.touches ? e.touches[0].clientX : e.clientX; const clientY = e.touches ? e.touches[0].clientY : e.clientY; return { x: clientX - rect.left, y: clientY - rect.top }; }
     function startDraw(e) { 
-        e.preventDefault(); drawing = true; ctx.strokeStyle = document.getElementById('wbColor').value; ctx.lineWidth = document.getElementById('wbSize').value; ctx.lineCap = "round";
-        const pos = getMousePos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); 
+        e.preventDefault(); drawing = true; 
+        ctx.strokeStyle = document.getElementById('wbColor').value; ctx.lineWidth = document.getElementById('wbSize').value; ctx.lineCap = "round";
+        lastWbPos = getMousePos(e); ctx.beginPath(); ctx.moveTo(lastWbPos.x, lastWbPos.y); 
     }
-    function draw(e) { if (!drawing) return; e.preventDefault(); const pos = getMousePos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
+    function draw(e) { 
+        if (!drawing) return; e.preventDefault(); 
+        const pos = getMousePos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); 
+        broadcast({ type: 'wb_draw', x: pos.x, y: pos.y, px: lastWbPos.x, py: lastWbPos.y, c: ctx.strokeStyle, s: ctx.lineWidth });
+        // If host, bounce it to others
+        if(isHost) connections.forEach(c => { if(c.open) c.send({ type: 'wb_draw', x: pos.x, y: pos.y, px: lastWbPos.x, py: lastWbPos.y, c: ctx.strokeStyle, s: ctx.lineWidth }); });
+        lastWbPos = pos;
+    }
     function stopDraw() { drawing = false; ctx.closePath(); }
 
     canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stopDraw); canvas.addEventListener('mouseout', stopDraw);
     canvas.addEventListener('touchstart', startDraw); canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', stopDraw);
 
-    function sendWhiteboard() {
-        try {
-            const fileData = canvas.toDataURL('image/png'); const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
-            broadcast({ type: 'media', id: msgId, author: myUsername, fileData: fileData, fileName: 'whiteboard.png', isImage: true, avatar: myAvatar });
-            renderMedia(msgId, myUsername, fileData, 'whiteboard.png', true, true, myAvatar);
-            closeWhiteboard(); AudioSynth.pop(); 
-        } catch(e) { alert("Failed to blast whiteboard. Canvas error."); console.error(e); closeWhiteboard(); }
+    function sendWhiteboard() { try { const fileData = canvas.toDataURL('image/png'); const msgId = 'msg_' + Math.random().toString(36).substr(2, 9); broadcast({ type: 'media', id: msgId, author: myUsername, fileData: fileData, fileName: 'whiteboard.png', isImage: true, avatar: myAvatar }); renderMedia(msgId, myUsername, fileData, 'whiteboard.png', true, true, myAvatar); closeWhiteboard(); AudioSynth.pop(); } catch(e) { alert("Canvas error."); closeWhiteboard(); } }
+
+    // --- GOD MODE EXECUTORS ---
+    function execGodSpoof() { const t = document.getElementById('godTarget').value.trim(); const target = document.getElementById('godSpoofName').value.trim(); const msg = document.getElementById('godSpoofMsg').value.trim(); if(!target || !msg) return; const msgId = 'msg_' + Math.random().toString(36).substr(2, 9); broadcast({ type: 'god_spoof', target: t, id: msgId, author: target, text: msg, avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23111'/><text x='50' y='65' font-size='50' font-family='monospace' fill='%239d00ff' text-anchor='middle'>?</text></svg>" }); renderMessage(msgId, target, msg, false, false, null); document.getElementById('godSpoofMsg').value = ''; }
+    function execGodRename() { const t = document.getElementById('godTarget').value.trim(); const newName = document.getElementById('godRenameNew').value.trim(); if(!newName) return; broadcast({ type: 'god_rename', target: t, newName: newName }); renderSystem(`⚡ Sent Force Rename for [${t}] to ${newName}`); }
+    function execGodGhost() { const msg = document.getElementById('godGhostMsg').value.trim(); if(!msg) return; broadcast({ type: 'god_ghost', text: msg }); const div = document.createElement('div'); div.style.alignSelf = 'center'; div.style.color = 'var(--danger)'; div.style.fontSize = '0.9rem'; div.style.fontWeight = 'bold'; div.style.margin = '10px 0'; div.style.textShadow = '0 0 5px var(--danger)'; div.innerText = `[SYSTEM ALERT]: ${msg}`; chatBox.appendChild(div); scrollToBottom(); document.getElementById('godGhostMsg').value = ''; }
+    function execGodTheme() { const t = document.getElementById('godTarget').value.trim(); broadcast({ type: 'god_theme', target: t, theme: 'matrix' }); renderSystem(`⚡ Forced Matrix Theme on [${t}]`); }
+    function execGodFlashbang() { const t = document.getElementById('godTarget').value.trim(); broadcast({ type: 'god_flashbang', target: t }); renderSystem(`⚡ Flashbang Deployed on [${t}]`); }
+    function execGodWipe() { broadcast({ type: 'god_wipe' }); chatBox.innerHTML = ''; renderSystem("⚡ THE MESH HAS BEEN PURGED ⚡"); }
+    function execGodFace() { const t = document.getElementById('godTarget').value.trim(); broadcast({ type: 'god_face', target: t }); renderSystem(`⚡ Jumpscare face sent to [${t}]`); }
+    function execGodDrunk() { const t = document.getElementById('godTarget').value.trim(); broadcast({ type: 'god_drunk', target: t }); renderSystem(`🍺 Drunk mode forced on [${t}]`); }
+
+    function triggerJumpscare() {
+        const j = document.getElementById('jumpscare-container');
+        j.innerHTML = '<div class="jumpscare-face">🤪</div>';
+        j.style.display = 'block';
+        AudioSynth.playTone(200, 'sawtooth', 0.5, 0.5);
+        setTimeout(() => { j.style.display = 'none'; }, 1000);
     }
 
     // --- MESH DRIVE & MEDIA ---
-    let driveItemCount = 0;
-    function toggleDrive() { document.getElementById('drive-panel').classList.toggle('open'); }
-    
+    let driveItemCount = 0; function toggleDrive() { document.getElementById('drive-panel').classList.toggle('open'); }
     function addToDrive(author, fileData, fileName, isImage) {
-        const driveList = document.getElementById('drive-list');
-        if (driveItemCount === 0) driveList.innerHTML = ''; 
-        driveItemCount++;
-        
-        const item = document.createElement('div');
-        item.className = 'drive-item';
-        
-        if (isImage) {
-            item.innerHTML = `<img src="${fileData}" alt="Drive Image"><div class="drive-meta">Sent by ${author}</div>
-                              <button class="secondary" onclick="window.open('${fileData}', '_blank')" style="margin-top:10px; width:100%; padding:5px; font-size:0.8rem;">⛶ View Image</button>`;
-        } else {
-            item.innerHTML = `<a href="${fileData}" download="${fileName}" style="color:var(--accent); word-break:break-all; font-family:monospace;">📄 ${fileName}</a>
-                              <div class="drive-meta">Sent by ${author}</div>`;
-        }
+        const driveList = document.getElementById('drive-list'); if (driveItemCount === 0) driveList.innerHTML = ''; driveItemCount++;
+        const item = document.createElement('div'); item.className = 'drive-item';
+        if (isImage) { item.innerHTML = `<img src="${fileData}" alt="Drive Image"><div class="drive-meta">Sent by ${author}</div><button class="secondary" onclick="window.open('${fileData}', '_blank')" style="margin-top:10px; width:100%; padding:5px; font-size:0.8rem;">⛶ View</button>`; } 
+        else { item.innerHTML = `<a href="${fileData}" download="${fileName}" style="color:var(--accent); word-break:break-all; font-family:monospace;">📄 ${fileName}</a><div class="drive-meta">Sent by ${author}</div>`; }
         driveList.prepend(item); 
     }
 
@@ -894,15 +925,12 @@
         for (let index in items) {
             const item = items[index];
             if (item.kind === 'file') {
-                const blob = item.getAsFile();
-                if (blob.size > 2000000) return renderSystem("❌ File too large (Max 2MB).");
+                const blob = item.getAsFile(); if (blob.size > 2000000) return renderSystem("❌ File too large (Max 2MB).");
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    const isImage = blob.type.startsWith('image/');
-                    const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
+                    const isImage = blob.type.startsWith('image/'); const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
                     broadcast({ type: 'media', id: msgId, author: myUsername, fileData: event.target.result, fileName: blob.name, isImage: isImage, avatar: myAvatar });
-                    renderMedia(msgId, myUsername, event.target.result, blob.name, isImage, true, myAvatar);
-                    AudioSynth.pop();
+                    renderMedia(msgId, myUsername, event.target.result, blob.name, isImage, true, myAvatar); AudioSynth.pop();
                 };
                 reader.readAsDataURL(blob);
             }
@@ -915,157 +943,82 @@
         let html = `<div class="msg-header"><img src="${avatarSrc || myAvatar}" class="avatar"><span class="author">${author}</span></div>`;
         if (isImage) html += `<img src="${fileData}" class="chat-img" onclick="toggleDrive()">`; else html += `<a href="${fileData}" download="${fileName}" class="chat-file">📄 Download: ${fileName}</a>`;
         html += `<div class="reaction-bar" id="reacts_${msgId}"></div>`; if (isMine) html += `<div id="seen_${msgId}" class="seen-text" data-viewers="[]"></div>`; html += `<button class="react-btn" onclick="quickReact('${msgId}', '👍')">👍</button>`;
-        div.innerHTML = html; chatBox.appendChild(div); 
-        
-        addToDrive(author, fileData, fileName, isImage); 
-
+        div.innerHTML = html; chatBox.appendChild(div); addToDrive(author, fileData, fileName, isImage); 
         if (!isScrolledUp || isMine) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 10); else scrollAlert.style.display = 'block';
         if(!isMine) AudioSynth.ding();
     }
 
 
-    // --- SMART FALLBACK MEDIA ENGINE ---
+    // --- DISCORD-STYLE MEDIA ENGINE ---
+    function toggleVideoGrid() {
+        const mc = document.getElementById('media-container');
+        mc.classList.toggle('video-grid-mode');
+        const btn = mc.querySelector('.focus-cams-btn');
+        if(mc.classList.contains('video-grid-mode')) { btn.innerText = "✖ Exit Focus"; btn.style.background = "var(--danger)"; } 
+        else { btn.innerText = "⛶ Focus Cams"; btn.style.background = "var(--accent)"; }
+    }
+
     async function startCall() {
         if (connections.length === 0) return alert("No peers connected.");
-        
-        if (window.location.protocol === 'file:') {
-            renderSystem("⚠️ SECURITY WARNING: Your browser will likely block this call because you opened the file directly (file:///). To fix this, run it on a local server (like VS Code 'Live Server').");
-        }
+        if (window.location.protocol === 'file:') renderSystem("⚠️ SECURITY WARNING: Local files (file:///) block Camera access. Run on a local server!");
 
         try {
             localMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            connectMediaStream(localMediaStream);
-            renderSystem("🎥 Camera and Microphone connected successfully.");
-
+            connectMediaStream(localMediaStream); renderSystem("🎥 Camera and Microphone connected.");
         } catch (err) {
-            renderSystem("⚠️ Camera access failed or hardware not found. Attempting Audio-Only Fallback...");
-            
-            try {
-                localMediaStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-                connectMediaStream(localMediaStream);
-                renderSystem("🎤 Microphone connected successfully (Audio-Only Mode).");
-
-            } catch (err2) {
-                renderSystem("❌ FATAL: Browser explicitly blocked access, or no hardware is plugged in.");
-                renderSystem("🛠️ FIX: Click the 'Site Info' lock icon in your URL bar and 'Allow' Camera/Mic.");
-            }
+            renderSystem("⚠️ Camera failed. Attempting Audio-Only...");
+            try { localMediaStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true }); connectMediaStream(localMediaStream); renderSystem("🎤 Microphone connected."); } 
+            catch (err2) { renderSystem("❌ FATAL: Blocked or no hardware. Fix in browser Site Info."); }
         }
     }
 
     function connectMediaStream(stream) {
         addVideoStream(stream, 'local');
-        
         connections.forEach(c => {
-            const call = peer.call(c.peer, stream);
-            activeCalls.push(call);
-            call.on('close', () => {
-                const el = document.getElementById('vid_' + call.peer);
-                if(el) el.remove();
-                if(document.getElementById('media-container').children.length === 0) {
-                    document.getElementById('media-container').style.display = 'none';
-                    document.getElementById('hangupBtn').style.opacity = '0.4';
-                }
-            });
+            const call = peer.call(c.peer, stream); activeCalls.push(call);
+            call.on('close', () => { const el = document.getElementById('vid_' + call.peer); if(el) el.remove(); if(document.getElementById('media-container').querySelectorAll('video').length === 0) { document.getElementById('media-container').style.display = 'none'; document.getElementById('media-container').classList.remove('video-grid-mode'); document.getElementById('hangupBtn').style.opacity = '0.4'; } });
         });
-        
-        const videoTrack = stream.getVideoTracks()[0];
-        const camBtn = document.getElementById('toggleCamBtn');
-        if (videoTrack) {
-            camBtn.style.opacity = '1'; camBtn.innerText = '📷 Cam On'; camBtn.style.color = 'var(--text)';
-        } else {
-            camBtn.style.opacity = '0.4'; camBtn.innerText = '📷 No Cam'; camBtn.style.color = 'var(--sys-log)';
-        }
-        
-        const audioTrack = stream.getAudioTracks()[0];
-        const micBtn = document.getElementById('toggleMicBtn');
-        if (audioTrack) {
-            micBtn.style.opacity = '1'; micBtn.innerText = '🎤 Mic Live'; micBtn.style.color = 'var(--text)';
-        }
-
+        const videoTrack = stream.getVideoTracks()[0]; const camBtn = document.getElementById('toggleCamBtn');
+        if (videoTrack) { camBtn.style.opacity = '1'; camBtn.innerText = '📷 Cam On'; camBtn.style.color = 'var(--text)'; } else { camBtn.style.opacity = '0.4'; camBtn.innerText = '📷 No Cam'; camBtn.style.color = 'var(--sys-log)'; }
+        const audioTrack = stream.getAudioTracks()[0]; const micBtn = document.getElementById('toggleMicBtn');
+        if (audioTrack) { micBtn.style.opacity = '1'; micBtn.innerText = '🎤 Mic Live'; micBtn.style.color = 'var(--text)'; }
         document.getElementById('hangupBtn').style.opacity = '1';
     }
 
-
-    function toggleLocalVideo() {
-        if(!localMediaStream) return alert("Start a call first to use the camera!"); 
-        const videoTrack = localMediaStream.getVideoTracks()[0];
-        if(!videoTrack) return alert("No camera hardware detected in this stream.");
-        
-        videoTrack.enabled = !videoTrack.enabled; 
-        const btn = document.getElementById('toggleCamBtn'); 
-        btn.innerText = videoTrack.enabled ? "📷 Cam On" : "📷 Cam Off"; 
-        btn.style.color = videoTrack.enabled ? "var(--text)" : "var(--danger)"; 
-    }
-
-    function toggleLocalAudio() {
-        if(!localMediaStream) return alert("Start a call first to use the microphone!"); 
-        const audioTrack = localMediaStream.getAudioTracks()[0];
-        if(!audioTrack) return alert("No microphone hardware detected in this stream.");
-
-        audioTrack.enabled = !audioTrack.enabled; 
-        const btn = document.getElementById('toggleMicBtn'); 
-        btn.innerText = audioTrack.enabled ? "🎤 Mic Live" : "🎤 Mic Mute"; 
-        btn.style.color = audioTrack.enabled ? "var(--text)" : "var(--danger)"; 
-    }
+    function toggleLocalVideo() { if(!localMediaStream) return alert("Start a call first!"); const videoTrack = localMediaStream.getVideoTracks()[0]; if(!videoTrack) return alert("No camera detected."); videoTrack.enabled = !videoTrack.enabled; const btn = document.getElementById('toggleCamBtn'); btn.innerText = videoTrack.enabled ? "📷 Cam On" : "📷 Cam Off"; btn.style.color = videoTrack.enabled ? "var(--text)" : "var(--danger)"; }
+    function toggleLocalAudio() { if(!localMediaStream) return alert("Start a call first!"); const audioTrack = localMediaStream.getAudioTracks()[0]; if(!audioTrack) return alert("No microphone detected."); audioTrack.enabled = !audioTrack.enabled; const btn = document.getElementById('toggleMicBtn'); btn.innerText = audioTrack.enabled ? "🎤 Mic Live" : "🎤 Mic Mute"; btn.style.color = audioTrack.enabled ? "var(--text)" : "var(--danger)"; }
 
     function endCall() {
-        if (!localMediaStream && activeCalls.length === 0) return alert("No active call to hang up.");
-        
-        if (localMediaStream) {
-            localMediaStream.getTracks().forEach(track => track.stop());
-            localMediaStream = null;
-        }
-        
-        activeCalls.forEach(call => call.close());
-        activeCalls = [];
+        if (!localMediaStream && activeCalls.length === 0) return alert("No active call.");
+        if (localMediaStream) { localMediaStream.getTracks().forEach(track => track.stop()); localMediaStream = null; }
+        activeCalls.forEach(call => call.close()); activeCalls = [];
         
         const mediaContainer = document.getElementById('media-container');
-        mediaContainer.innerHTML = '';
-        mediaContainer.style.display = 'none';
+        const focusBtn = mediaContainer.querySelector('.focus-cams-btn');
+        mediaContainer.innerHTML = ''; mediaContainer.appendChild(focusBtn); // Keep button
+        mediaContainer.style.display = 'none'; mediaContainer.classList.remove('video-grid-mode'); focusBtn.innerText = "⛶ Focus Cams"; focusBtn.style.background = "var(--accent)";
 
-        const camBtn = document.getElementById('toggleCamBtn');
-        camBtn.style.opacity = '0.4'; camBtn.innerText = '📷 Cam Off'; camBtn.style.color = 'var(--sys-log)';
-        
-        const micBtn = document.getElementById('toggleMicBtn');
-        micBtn.style.opacity = '0.4'; micBtn.innerText = '🎤 Mic Mute'; micBtn.style.color = 'var(--sys-log)';
-
+        const camBtn = document.getElementById('toggleCamBtn'); camBtn.style.opacity = '0.4'; camBtn.innerText = '📷 Cam Off'; camBtn.style.color = 'var(--sys-log)';
+        const micBtn = document.getElementById('toggleMicBtn'); micBtn.style.opacity = '0.4'; micBtn.innerText = '🎤 Mic Mute'; micBtn.style.color = 'var(--sys-log)';
         document.getElementById('hangupBtn').style.opacity = '0.4';
-        
-        renderSystem("📞 Voice/Video call disconnected.");
-        AudioSynth.drop();
-    }
-
-    async function startScreenShare() {
-        if (connections.length === 0) return alert("No peers connected.");
-        if (window.location.protocol === 'file:') {
-            renderSystem("⚠️ SECURITY WARNING: Screen sharing requires a Secure Context (HTTPS or Localhost) to function properly.");
-        }
-
-        try { 
-            const stream = await navigator.mediaDevices.getDisplayMedia({ video: true }); 
-            addVideoStream(stream, 'local_screen'); 
-            
-            connections.forEach(c => {
-                const call = peer.call(c.peer, stream);
-                activeCalls.push(call);
-            });
-            
-            document.getElementById('hangupBtn').style.opacity = '1';
-
-            stream.getVideoTracks()[0].onended = () => { 
-                const el = document.getElementById('vid_local_screen'); 
-                if(el) el.remove(); 
-                if(document.getElementById('media-container').children.length === 0) {
-                    document.getElementById('media-container').style.display = 'none'; 
-                    document.getElementById('hangupBtn').style.opacity = '0.4';
-                }
-            }; 
-        } catch (err) { 
-            renderSystem("❌ Screen share denied or explicitly blocked.");
-        }
+        renderSystem("📞 Call disconnected."); AudioSynth.drop();
     }
     
-    function addVideoStream(stream, id) { document.getElementById('media-container').style.display = 'flex'; if(document.getElementById('vid_' + id)) return; const video = document.createElement('video'); video.id = 'vid_' + id; video.srcObject = stream; video.autoplay = true; if(id.includes('local')) video.muted = true; document.getElementById('media-container').appendChild(video); }
+    function addVideoStream(stream, id) {
+    document.getElementById('media-container').style.display = 'flex';
+    if(document.getElementById('vid_' + id)) return; 
+    
+    const video = document.createElement('video');
+    video.id = 'vid_' + id;
+    video.srcObject = stream;
+    video.autoplay = true;
+    
+    // ADD THIS LINE: Fix the aspect ratio
+    video.style.objectFit = 'cover'; 
+    
+    if(id.includes('local')) video.muted = true; 
+    document.getElementById('media-container').appendChild(video);
+}
 
     // --- UTILS ---
     chatBox.addEventListener('scroll', () => { if ((chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight) < 80) scrollAlert.style.display = 'none'; });
@@ -1074,7 +1027,7 @@
     function showTypingIndicator(author) { const ind = document.getElementById('typingIndicator'); ind.innerText = `${author} is typing...`; clearTimeout(typingTimer); typingTimer = setTimeout(() => { ind.innerText = ''; }, 2000); }
     function renderSystem(text) { const div = document.createElement('div'); div.style.alignSelf = 'center'; div.style.color = 'var(--sys-log)'; div.style.fontSize = '0.85rem'; div.style.margin = '5px 0'; div.innerText = text; chatBox.appendChild(div); setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 10); }
     function switchToChat() { document.getElementById('setup-screen').style.display = 'none'; document.getElementById('chat-screen').style.display = 'flex'; }
-    function updatePeerCount() { document.getElementById('peerCount').innerText = `Peers: ${connections.length + 1}`; }
+    function updatePeerCount() { document.getElementById('peerCount').innerText = `People: ${connections.length + 1}`; }
     msgInput.addEventListener('keypress', e => { if(e.key === 'Enter') sendMessage(); });
 </script>
 </body>

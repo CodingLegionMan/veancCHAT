@@ -316,6 +316,7 @@
                 <button class="secondary" onclick="openWhiteboard()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">🎨 Draw</button>
                 <button class="secondary" onclick="toggleDrive()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem; border-color: #bd93f9; color: #bd93f9;">📂 Drive</button>
                 <button class="secondary" onclick="startCall()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">📞 Call</button>
+                <<button class="secondary" onclick="togglePet()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">🐾 Toggle Pet</button>
             </div>
         </div>
 
@@ -476,11 +477,19 @@
     }
 
     function setupConnection(conn) {
-        conn.on('open', () => {
-            if(!connections.some(c => c.peer === conn.peer)) connections.push(conn);
-            renderSystem(`[SYS] Secured connection with ${conn.peer}`); AudioSynth.chirp();
-            if(!isHost) startDiagnostics(conn);
-        });
+    conn.on('open', () => {
+        if(!connections.some(c => c.peer === conn.peer)) connections.push(conn);
+        updatePeerCount(); 
+        renderSystem(`[SYS] Secured connection with ${conn.peer}`); 
+        AudioSynth.chirp();
+        if(!isHost) startDiagnostics(conn);
+    });
+    
+    // ... you probably have your conn.on('data', ...) stuff here ...
+    
+    // ... and your conn.on('close', ...) stuff here ...
+    
+} // <--- CHECK FOR THIS! IF THIS BRACKET IS MISSING, NOTHING WORKS.
 
         conn.on('data', data => {
             if (isHost && data.type !== 'ping' && data.type !== 'typing' && data.type !== 'wb_draw') broadcast(data, conn.peer); 
@@ -822,9 +831,23 @@
         cx.fillStyle='#000'; cx.fillRect(0,0,200,200); cx.fillStyle='#fff'; cx.font='12px monospace'; cx.fillText("Move mouse to start", 40, 100);
     }
 
-    // --- MESH PET SYSTEM ---
+// --- MESH PET SYSTEM ---
+    let petState = { hunger: 100, happiness: 100 }; // <-- THIS IS WHAT I FORGOT!
+    let petInterval;                                // <-- THIS TOO!
+    let petVisible = true;
+
+    function togglePet() {
+        petVisible = !petVisible;
+        const petContainer = document.getElementById('mesh-pet-container');
+        if (petContainer) petContainer.style.display = petVisible ? 'block' : 'none';
+        if (!petVisible) renderSystem("🐾 Mesh Pet hidden. (It is still alive in the background!)");
+    }
+
     function startPetCycle() {
-        document.getElementById('mesh-pet-container').style.display = 'block';
+        if(petVisible) {
+            const petContainer = document.getElementById('mesh-pet-container');
+            if(petContainer) petContainer.style.display = 'block';
+        }
         if(!petInterval) {
             petInterval = setInterval(() => {
                 petState.hunger = Math.max(0, petState.hunger - 2);
@@ -834,32 +857,41 @@
             }, 5000);
         }
     }
+
     function updatePetUI(state) {
         petState = state;
-        document.getElementById('mesh-pet-container').style.display = 'block';
+        if(petVisible) {
+            const petContainer = document.getElementById('mesh-pet-container');
+            if (petContainer) petContainer.style.display = 'block';
+        }
         updatePetLocalUI();
     }
+
     function updatePetLocalUI() {
         const status = document.getElementById('petStatus');
         const face = document.getElementById('petFace');
+        if(!status || !face) return;
+        
         if(petState.hunger <= 10) { status.innerText = "Starving!"; status.style.color = "var(--danger)"; face.innerText = "(x_x)"; }
         else if(petState.happiness <= 20) { status.innerText = "Sad"; status.style.color = "#ffff00"; face.innerText = "(;_;)"; }
         else { status.innerText = "Happy"; status.style.color = "var(--accent)"; face.innerText = "(ᵔᴥᵔ)"; }
     }
+
     function interactPet(action) {
         if(action === 'feed') petState.hunger = Math.min(100, petState.hunger + 20);
         if(action === 'pet') petState.happiness = Math.min(100, petState.happiness + 20);
         updatePetLocalUI();
         broadcast({ type: 'pet_action', action: action, author: myUsername });
-        AudioSynth.playTone(600, 'sine', 0.1, 0.05);
+        if(typeof AudioSynth !== 'undefined') AudioSynth.playTone(600, 'sine', 0.1, 0.05);
     }
+
     function applyPetAction(action, author) {
         if(action === 'feed') petState.hunger = Math.min(100, petState.hunger + 20);
         if(action === 'pet') petState.happiness = Math.min(100, petState.happiness + 20);
         updatePetLocalUI();
         renderSystem(`🐾 ${author} interacted with the Mesh Pet!`);
     }
-
+    
     // --- CO-OP WHITEBOARD ---
     const wbModal = document.getElementById('whiteboardModal'); const canvas = document.getElementById('wbCanvas'); const ctx = canvas.getContext('2d');
     let drawing = false; let lastWbPos = null;

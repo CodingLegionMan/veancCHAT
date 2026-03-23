@@ -215,6 +215,50 @@
     </div>
 </div>
 
+<div id="preCallModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 15px; color: var(--accent); text-align: center;">📞 Pre-Call Setup</h3>
+        
+        <label style="display: block; margin-top: 15px; color: var(--text);">Select Camera</label>
+        <select id="cam-select" style="width: 100%; padding: 8px; margin-top: 5px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-family: monospace;"></select>
+
+        <label style="display: block; margin-top: 15px; color: var(--text);">Select Microphone</label>
+        <select id="mic-select" style="width: 100%; padding: 8px; margin-top: 5px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-family: monospace;"></select>
+
+        <div style="display: flex; gap: 10px; margin-top: 25px;">
+            <button onclick="confirmAndStartCall()" style="flex: 2; margin: 0;">Start Call</button>
+            <button class="secondary" onclick="document.getElementById('preCallModal').style.display='none'" style="flex: 1; margin: 0; border-color: var(--danger); color: var(--danger);">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="mediaSettingsModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 15px; color: var(--accent); text-align: center;">⚙️ Media Options</h3>
+        <label style="display: block; margin-top: 15px; color: var(--text);">Camera Options: Video Quality</label>
+        <select id="video-quality" style="width: 100%; padding: 8px; margin-top: 5px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-family: monospace;">
+            <option value="480">Standard (480p)</option>
+            <option value="720" selected>High (720p) - Recommended</option>
+            <option value="1080">Ultra HD (1080p)</option>
+        </select>
+
+        <label style="display: block; margin-top: 20px; color: var(--text);">Voice Options: Processing</label>
+        <div style="margin-top: 10px; color: var(--text); display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="noise-suppression" checked style="accent-color: var(--accent); transform: scale(1.2); cursor: pointer;"> 
+            <label for="noise-suppression" style="cursor: pointer;">Filter Background Noise</label>
+        </div>
+        <div style="margin-top: 10px; color: var(--text); display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="echo-cancellation" checked style="accent-color: var(--accent); transform: scale(1.2); cursor: pointer;"> 
+            <label for="echo-cancellation" style="cursor: pointer;">Echo Cancellation</label>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 25px;">
+            <button onclick="applyMediaSettings()" style="flex: 2; margin: 0;">Apply & Restart</button>
+            <button class="secondary" onclick="closeMediaSettings()" style="flex: 1; margin: 0; border-color: var(--danger); color: var(--danger);">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <div id="gamesModal" class="modal">
     <div class="modal-content">
         <h3 style="margin-bottom: 15px; color: var(--accent); text-align: center;">🎮 MESH GAME CENTER</h3>
@@ -313,10 +357,12 @@
                 <button id="toggleMicBtn" class="secondary" onclick="toggleLocalAudio()" style="width: auto; padding: 5px 10px; margin:0; font-size: 0.8rem; border-color: var(--sys-log); opacity: 0.4;">🎤 Mic Mute</button>
                 <button id="hangupBtn" class="secondary" onclick="endCall()" style="width: auto; padding: 5px 10px; margin:0; font-size: 0.8rem; border-color: var(--danger); color: var(--danger); opacity: 0.4;">❌ Hangup</button>
                 
+                <button class="secondary" onclick="openMediaSettings()" style="width: auto; padding: 5px 10px; margin:0; font-size: 0.8rem; border-color: var(--accent); color: var(--accent);">⚙️ Media</button>
+                
                 <button class="secondary" onclick="openWhiteboard()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">🎨 Draw</button>
                 <button class="secondary" onclick="toggleDrive()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem; border-color: #bd93f9; color: #bd93f9;">📂 Drive</button>
-                <button class="secondary" onclick="startCall()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">📞 Call</button>
-                <<button class="secondary" onclick="togglePet()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">🐾 Toggle Pet</button>
+                <button class="secondary" onclick="togglePet()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">🐾 Toggle Pet</button>
+                <button class="secondary" onclick="openPreCallModal()" style="width: auto; padding: 5px 15px; margin:0; font-size: 0.8rem;">📞 Call</button>
             </div>
         </div>
 
@@ -394,11 +440,139 @@
     let myAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23111'/><text x='50' y='65' font-size='50' font-family='monospace' fill='%2300ff41' text-anchor='middle'>_</text></svg>";
     let localMediaStream = null; let activeCalls = []; 
     let gameStates = {}; 
-    let replyingTo = null; // INJECTED: Reply Tracker
+    let replyingTo = null; 
 
-    // INJECTED: MESH PET STATE
-    let petState = { hunger: 50, happiness: 100 };
-    let petInterval = null;
+    // --- INJECTED: MEDIA SETTINGS & QoL LOGIC ---
+    let currentVideoQuality = 720;
+    let useNoiseSuppression = true;
+    let useEchoCancellation = true;
+    let selectedCam = null;
+    let selectedMic = null;
+
+    function openMediaSettings() { document.getElementById('mediaSettingsModal').style.display = 'flex'; }
+    function closeMediaSettings() { document.getElementById('mediaSettingsModal').style.display = 'none'; }
+
+    async function applyMediaSettings() {
+        currentVideoQuality = parseInt(document.getElementById('video-quality').value);
+        useNoiseSuppression = document.getElementById('noise-suppression').checked;
+        useEchoCancellation = document.getElementById('echo-cancellation').checked;
+        closeMediaSettings();
+        
+        if (localMediaStream && activeCalls.length > 0) {
+            endCall();
+            renderSystem("Applying new hardware settings...");
+            setTimeout(() => { startCall(); }, 500); 
+        } else if (localMediaStream) {
+            endCall();
+            setTimeout(() => { startCall(); }, 500);
+        } else {
+            renderSystem(`[Settings] Quality set to ${currentVideoQuality}p. Filter: ${useNoiseSuppression ? 'On' : 'Off'}`);
+        }
+    }
+
+    // --- INJECTED: PRE-CALL SETUP MODAL LOGIC ---
+    async function openPreCallModal() {
+        if (connections.length === 0) return alert("No peers connected.");
+        
+        // Briefly ask for permission to get the REAL names of the hardware devices
+        try {
+            const tempStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            tempStream.getTracks().forEach(t => t.stop());
+        } catch(e) { console.warn("Temp permission denied, labels might be generic.", e); }
+        
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const camSelect = document.getElementById('cam-select');
+        const micSelect = document.getElementById('mic-select');
+        camSelect.innerHTML = '';
+        micSelect.innerHTML = '';
+
+        let camCount = 1;
+        let micCount = 1;
+
+        devices.forEach(device => {
+            if (device.kind === 'videoinput') {
+                const opt = document.createElement('option');
+                opt.value = device.deviceId;
+                opt.text = device.label || `Camera ${camCount++}`;
+                camSelect.appendChild(opt);
+            } else if (device.kind === 'audioinput') {
+                const opt = document.createElement('option');
+                opt.value = device.deviceId;
+                opt.text = device.label || `Microphone ${micCount++}`;
+                micSelect.appendChild(opt);
+            }
+        });
+
+        document.getElementById('preCallModal').style.display = 'flex';
+    }
+
+    function confirmAndStartCall() {
+        selectedCam = document.getElementById('cam-select').value;
+        selectedMic = document.getElementById('mic-select').value;
+        document.getElementById('preCallModal').style.display = 'none';
+        startCall();
+    }
+
+    // --- MESH PET SYSTEM ---
+    let petState = { hunger: 100, happiness: 100 };
+    let petInterval;
+    let petVisible = true;
+
+    function togglePet() {
+        petVisible = !petVisible;
+        const petContainer = document.getElementById('mesh-pet-container');
+        if (petContainer) petContainer.style.display = petVisible ? 'block' : 'none';
+        if (!petVisible) renderSystem("🐾 Mesh Pet hidden. (It is still alive in the background!)");
+    }
+
+    function startPetCycle() {
+        if(petVisible) {
+            const petContainer = document.getElementById('mesh-pet-container');
+            if(petContainer) petContainer.style.display = 'block';
+        }
+        if(!petInterval) {
+            petInterval = setInterval(() => {
+                petState.hunger = Math.max(0, petState.hunger - 2);
+                petState.happiness = Math.max(0, petState.happiness - 1);
+                updatePetLocalUI();
+                if (isHost) broadcast({ type: 'pet_sync', state: petState });
+            }, 5000);
+        }
+    }
+
+    function updatePetUI(state) {
+        petState = state;
+        if(petVisible) {
+            const petContainer = document.getElementById('mesh-pet-container');
+            if (petContainer) petContainer.style.display = 'block';
+        }
+        updatePetLocalUI();
+    }
+
+    function updatePetLocalUI() {
+        const status = document.getElementById('petStatus');
+        const face = document.getElementById('petFace');
+        if(!status || !face) return;
+        
+        if(petState.hunger <= 10) { status.innerText = "Starving!"; status.style.color = "var(--danger)"; face.innerText = "(x_x)"; }
+        else if(petState.happiness <= 20) { status.innerText = "Sad"; status.style.color = "#ffff00"; face.innerText = "(;_;)"; }
+        else { status.innerText = "Happy"; status.style.color = "var(--accent)"; face.innerText = "(ᵔᴥᵔ)"; }
+    }
+
+    function interactPet(action) {
+        if(action === 'feed') petState.hunger = Math.min(100, petState.hunger + 20);
+        if(action === 'pet') petState.happiness = Math.min(100, petState.happiness + 20);
+        updatePetLocalUI();
+        broadcast({ type: 'pet_action', action: action, author: myUsername });
+        if(typeof AudioSynth !== 'undefined') AudioSynth.playTone(600, 'sine', 0.1, 0.05);
+    }
+
+    function applyPetAction(action, author) {
+        if(action === 'feed') petState.hunger = Math.min(100, petState.hunger + 20);
+        if(action === 'pet') petState.happiness = Math.min(100, petState.happiness + 20);
+        updatePetLocalUI();
+        renderSystem(`🐾 ${author} interacted with the Mesh Pet!`);
+    }
 
     const chatBox = document.getElementById('chatBox');
     const msgInput = document.getElementById('msgInput');
@@ -424,15 +598,19 @@
     function toggleDyslexia() { const isOn = document.getElementById('dyslexiaToggle').checked; if (isOn) document.body.classList.add('dyslexia-font'); else document.body.classList.remove('dyslexia-font'); localStorage.setItem('veancDyslexia', isOn); }
     function toggleAnimations() { const isOn = document.getElementById('animationToggle').checked; if (isOn) document.body.classList.add('no-animations'); else document.body.classList.remove('no-animations'); localStorage.setItem('veancNoAnim', isOn); }
 
-    // --- P2P MESH LOGIC ---
+    // --- P2P MESH LOGIC (Updated Routing and STUN) ---
     function initPeer(customId = null) {
         AudioSynth.init();
         myUsername = document.getElementById('usernameInput').value.trim() || "User_" + Math.floor(Math.random()*100);
-        const opts = { config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }] } };
+        
+        const opts = { config: { 'iceServers': [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun.cloudflare.com:3478' }
+        ] } };
+        
         peer = customId ? new Peer(customId, opts) : new Peer(opts);
         
         peer.on('call', call => { 
-            // INJECTED: Provide local stream back if we are already in a call (Fixes 3+ bug)
             call.answer(localMediaStream || undefined); 
             activeCalls.push(call);
             call.on('stream', stream => {
@@ -459,9 +637,9 @@
         peer.on('open', id => {
             document.getElementById('roomPinDisplay').innerHTML = `ROOM PIN: <span class="pin-badge" onclick="navigator.clipboard.writeText('${id}')">${id}</span>`;
             switchToChat(); renderSystem("Mesh Hosted. Give your PIN to your friends.");
-            startPetCycle(); // Host starts pet
+            startPetCycle(); 
         });
-        peer.on('connection', conn => { setupConnection(conn); updatePeerCount(); });
+        peer.on('connection', conn => { setupConnection(conn); });
     }
 
     function joinHost(reconnectPin = null) {
@@ -477,19 +655,12 @@
     }
 
     function setupConnection(conn) {
-    conn.on('open', () => {
-        if(!connections.some(c => c.peer === conn.peer)) connections.push(conn);
-        updatePeerCount(); 
-        renderSystem(`[SYS] Secured connection with ${conn.peer}`); 
-        AudioSynth.chirp();
-        if(!isHost) startDiagnostics(conn);
-    });
-    
-    // ... you probably have your conn.on('data', ...) stuff here ...
-    
-    // ... and your conn.on('close', ...) stuff here ...
-    
-} // <--- CHECK FOR THIS! IF THIS BRACKET IS MISSING, NOTHING WORKS.
+        conn.on('open', () => {
+            if(!connections.some(c => c.peer === conn.peer)) connections.push(conn);
+            updatePeerCount();
+            renderSystem(`[SYS] Secured connection with ${conn.peer}`); AudioSynth.chirp();
+            if(!isHost) startDiagnostics(conn);
+        });
 
         conn.on('data', data => {
             if (isHost && data.type !== 'ping' && data.type !== 'typing' && data.type !== 'wb_draw') broadcast(data, conn.peer); 
@@ -499,22 +670,38 @@
                 if (!document.hidden) broadcast({ type: 'seen', msgId: data.id, viewer: myUsername });
             }
             else if (data.type === 'whisper') { if (data.target === myUsername) renderMessage(data.id, data.author, `[Whisper]: ${data.text}`, false, false, data.avatar, true); }
+            
+            else if (data.type === 'hangup_signal') {
+                const callIndex = activeCalls.findIndex(c => c.peer === conn.peer);
+                if (callIndex !== -1) {
+                    activeCalls[callIndex].close();
+                    activeCalls.splice(callIndex, 1);
+                }
+                const el = document.getElementById('vid_' + conn.peer);
+                if (el) el.remove();
+                
+                const remainingVids = document.getElementById('media-container').querySelectorAll('video');
+                if(remainingVids.length === 0) {
+                    document.getElementById('media-container').style.display = 'none';
+                    document.getElementById('media-container').classList.remove('video-grid-mode');
+                    document.getElementById('hangupBtn').style.opacity = '0.4';
+                }
+                renderSystem(`📞 Peer dropped out of the video call.`);
+            }
+
             else if (data.type === 'game_start') { gameStates[data.gameId] = data.state; renderGameMessage(data.id, data.gameId, data.gameType, data.state, data.author, data.avatar, false); }
             else if (data.type === 'game_action') processGameAction(data.gameId, data.action, data.payload, data.author);
             
-            // INJECTED: CO-OP DRAWING SYNC
-            else if (data.type === 'wb_draw' && !isHost) { // Host handles reflection inside draw
+            else if (data.type === 'wb_draw' && !isHost) { 
                 if(document.getElementById('whiteboardModal').style.display !== 'none') {
                     ctx.strokeStyle = data.c; ctx.lineWidth = data.s; ctx.lineCap = "round";
                     ctx.beginPath(); ctx.moveTo(data.px, data.py); ctx.lineTo(data.x, data.y); ctx.stroke();
                 }
             }
             
-            // INJECTED: PET SYNC
             else if (data.type === 'pet_sync') { updatePetUI(data.state); }
             else if (data.type === 'pet_action') { applyPetAction(data.action, data.author); }
 
-            // GOD MODE PAYLOADS
             else if (data.type === 'god_spoof') renderMessage(data.id, data.author, data.text, false, false, data.avatar);
             else if (data.type === 'god_rename') { if (myUsername === data.target || data.target==='all') { myUsername = data.newName; renderSystem(`⚡ A higher power has renamed you to: ${myUsername}`); } }
             else if (data.type === 'god_ghost') { const div = document.createElement('div'); div.style.alignSelf = 'center'; div.style.color = 'var(--danger)'; div.style.fontSize = '0.9rem'; div.style.fontWeight = 'bold'; div.style.margin = '10px 0'; div.style.textShadow = '0 0 5px var(--danger)'; div.innerText = `[SYSTEM ALERT]: ${data.text}`; chatBox.appendChild(div); scrollToBottom(); }
@@ -630,7 +817,6 @@
         html += `<div class="reaction-bar" id="reacts_${msgId}"></div>`;
         if (isMine) html += `<div id="seen_${msgId}" class="seen-text" data-viewers="[]"></div>`; 
         
-        // Actions
         let actionHtml = `<div class="msg-actions"><button class="action-btn" onclick="quickReact('${msgId}', '👍')" title="React">👍</button><button class="action-btn" onclick="prepReply('${msgId}', '${author}')" title="Reply">↩️</button>`;
         if (isHost && !isWhisper) actionHtml += `<button class="action-btn" onclick="pinMessage('${msgId}')" title="Pin">📌</button>`;
         actionHtml += `</div>`;
@@ -831,67 +1017,6 @@
         cx.fillStyle='#000'; cx.fillRect(0,0,200,200); cx.fillStyle='#fff'; cx.font='12px monospace'; cx.fillText("Move mouse to start", 40, 100);
     }
 
-// --- MESH PET SYSTEM ---
-    let petState = { hunger: 100, happiness: 100 }; // <-- THIS IS WHAT I FORGOT!
-    let petInterval;                                // <-- THIS TOO!
-    let petVisible = true;
-
-    function togglePet() {
-        petVisible = !petVisible;
-        const petContainer = document.getElementById('mesh-pet-container');
-        if (petContainer) petContainer.style.display = petVisible ? 'block' : 'none';
-        if (!petVisible) renderSystem("🐾 Mesh Pet hidden. (It is still alive in the background!)");
-    }
-
-    function startPetCycle() {
-        if(petVisible) {
-            const petContainer = document.getElementById('mesh-pet-container');
-            if(petContainer) petContainer.style.display = 'block';
-        }
-        if(!petInterval) {
-            petInterval = setInterval(() => {
-                petState.hunger = Math.max(0, petState.hunger - 2);
-                petState.happiness = Math.max(0, petState.happiness - 1);
-                updatePetLocalUI();
-                if (isHost) broadcast({ type: 'pet_sync', state: petState });
-            }, 5000);
-        }
-    }
-
-    function updatePetUI(state) {
-        petState = state;
-        if(petVisible) {
-            const petContainer = document.getElementById('mesh-pet-container');
-            if (petContainer) petContainer.style.display = 'block';
-        }
-        updatePetLocalUI();
-    }
-
-    function updatePetLocalUI() {
-        const status = document.getElementById('petStatus');
-        const face = document.getElementById('petFace');
-        if(!status || !face) return;
-        
-        if(petState.hunger <= 10) { status.innerText = "Starving!"; status.style.color = "var(--danger)"; face.innerText = "(x_x)"; }
-        else if(petState.happiness <= 20) { status.innerText = "Sad"; status.style.color = "#ffff00"; face.innerText = "(;_;)"; }
-        else { status.innerText = "Happy"; status.style.color = "var(--accent)"; face.innerText = "(ᵔᴥᵔ)"; }
-    }
-
-    function interactPet(action) {
-        if(action === 'feed') petState.hunger = Math.min(100, petState.hunger + 20);
-        if(action === 'pet') petState.happiness = Math.min(100, petState.happiness + 20);
-        updatePetLocalUI();
-        broadcast({ type: 'pet_action', action: action, author: myUsername });
-        if(typeof AudioSynth !== 'undefined') AudioSynth.playTone(600, 'sine', 0.1, 0.05);
-    }
-
-    function applyPetAction(action, author) {
-        if(action === 'feed') petState.hunger = Math.min(100, petState.hunger + 20);
-        if(action === 'pet') petState.happiness = Math.min(100, petState.happiness + 20);
-        updatePetLocalUI();
-        renderSystem(`🐾 ${author} interacted with the Mesh Pet!`);
-    }
-    
     // --- CO-OP WHITEBOARD ---
     const wbModal = document.getElementById('whiteboardModal'); const canvas = document.getElementById('wbCanvas'); const ctx = canvas.getContext('2d');
     let drawing = false; let lastWbPos = null;
@@ -912,7 +1037,6 @@
         if (!drawing) return; e.preventDefault(); 
         const pos = getMousePos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); 
         broadcast({ type: 'wb_draw', x: pos.x, y: pos.y, px: lastWbPos.x, py: lastWbPos.y, c: ctx.strokeStyle, s: ctx.lineWidth });
-        // If host, bounce it to others
         if(isHost) connections.forEach(c => { if(c.open) c.send({ type: 'wb_draw', x: pos.x, y: pos.y, px: lastWbPos.x, py: lastWbPos.y, c: ctx.strokeStyle, s: ctx.lineWidth }); });
         lastWbPos = pos;
     }
@@ -981,7 +1105,7 @@
     }
 
 
-    // --- DISCORD-STYLE MEDIA ENGINE ---
+    // --- DISCORD-STYLE MEDIA ENGINE (UPGRADED BANDWIDTH & SIGNALING) ---
     function toggleVideoGrid() {
         const mc = document.getElementById('media-container');
         mc.classList.toggle('video-grid-mode');
@@ -994,12 +1118,30 @@
         if (connections.length === 0) return alert("No peers connected.");
         if (window.location.protocol === 'file:') renderSystem("⚠️ SECURITY WARNING: Local files (file:///) block Camera access. Run on a local server!");
 
+        const videoConstraints = { width: { ideal: Math.round(currentVideoQuality * (16/9)) }, height: { ideal: currentVideoQuality }, frameRate: { ideal: 24 } };
+        if (selectedCam) videoConstraints.deviceId = { exact: selectedCam };
+
+        const audioConstraints = { echoCancellation: useEchoCancellation, noiseSuppression: useNoiseSuppression };
+        if (selectedMic) audioConstraints.deviceId = { exact: selectedMic };
+
+        const constraints = {
+            video: videoConstraints,
+            audio: audioConstraints
+        };
+
         try {
-            localMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            connectMediaStream(localMediaStream); renderSystem("🎥 Camera and Microphone connected.");
+            localMediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+            connectMediaStream(localMediaStream); renderSystem(`🎥 Camera and Microphone connected (${currentVideoQuality}p).`);
         } catch (err) {
             renderSystem("⚠️ Camera failed. Attempting Audio-Only...");
-            try { localMediaStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true }); connectMediaStream(localMediaStream); renderSystem("🎤 Microphone connected."); } 
+            try { 
+                const fallbackAudio = { echoCancellation: useEchoCancellation, noiseSuppression: useNoiseSuppression };
+                if (selectedMic) fallbackAudio.deviceId = { exact: selectedMic };
+                
+                const audioOnlyConstraints = { video: false, audio: fallbackAudio };
+                localMediaStream = await navigator.mediaDevices.getUserMedia(audioOnlyConstraints); 
+                connectMediaStream(localMediaStream); renderSystem("🎤 Microphone connected."); 
+            } 
             catch (err2) { renderSystem("❌ FATAL: Blocked or no hardware. Fix in browser Site Info."); }
         }
     }
@@ -1008,7 +1150,14 @@
         addVideoStream(stream, 'local');
         connections.forEach(c => {
             const call = peer.call(c.peer, stream); activeCalls.push(call);
-            call.on('close', () => { const el = document.getElementById('vid_' + call.peer); if(el) el.remove(); if(document.getElementById('media-container').querySelectorAll('video').length === 0) { document.getElementById('media-container').style.display = 'none'; document.getElementById('media-container').classList.remove('video-grid-mode'); document.getElementById('hangupBtn').style.opacity = '0.4'; } });
+            call.on('close', () => { 
+                const el = document.getElementById('vid_' + call.peer); if(el) el.remove(); 
+                if(document.getElementById('media-container').querySelectorAll('video').length === 0) { 
+                    document.getElementById('media-container').style.display = 'none'; 
+                    document.getElementById('media-container').classList.remove('video-grid-mode'); 
+                    document.getElementById('hangupBtn').style.opacity = '0.4'; 
+                } 
+            });
         });
         const videoTrack = stream.getVideoTracks()[0]; const camBtn = document.getElementById('toggleCamBtn');
         if (videoTrack) { camBtn.style.opacity = '1'; camBtn.innerText = '📷 Cam On'; camBtn.style.color = 'var(--text)'; } else { camBtn.style.opacity = '0.4'; camBtn.innerText = '📷 No Cam'; camBtn.style.color = 'var(--sys-log)'; }
@@ -1022,12 +1171,15 @@
 
     function endCall() {
         if (!localMediaStream && activeCalls.length === 0) return alert("No active call.");
+        
+        broadcast({ type: 'hangup_signal' });
+        
         if (localMediaStream) { localMediaStream.getTracks().forEach(track => track.stop()); localMediaStream = null; }
         activeCalls.forEach(call => call.close()); activeCalls = [];
         
         const mediaContainer = document.getElementById('media-container');
         const focusBtn = mediaContainer.querySelector('.focus-cams-btn');
-        mediaContainer.innerHTML = ''; mediaContainer.appendChild(focusBtn); // Keep button
+        mediaContainer.innerHTML = ''; mediaContainer.appendChild(focusBtn); 
         mediaContainer.style.display = 'none'; mediaContainer.classList.remove('video-grid-mode'); focusBtn.innerText = "⛶ Focus Cams"; focusBtn.style.background = "var(--accent)";
 
         const camBtn = document.getElementById('toggleCamBtn'); camBtn.style.opacity = '0.4'; camBtn.innerText = '📷 Cam Off'; camBtn.style.color = 'var(--sys-log)';
@@ -1036,21 +1188,29 @@
         renderSystem("📞 Call disconnected."); AudioSynth.drop();
     }
     
-    function addVideoStream(stream, id) {
-    document.getElementById('media-container').style.display = 'flex';
-    if(document.getElementById('vid_' + id)) return; 
-    
-    const video = document.createElement('video');
-    video.id = 'vid_' + id;
-    video.srcObject = stream;
-    video.autoplay = true;
-    
-    // ADD THIS LINE: Fix the aspect ratio
-    video.style.objectFit = 'cover'; 
-    
-    if(id.includes('local')) video.muted = true; 
-    document.getElementById('media-container').appendChild(video);
-}
+    function addVideoStream(stream, id) { 
+        document.getElementById('media-container').style.display = 'flex'; 
+        if(document.getElementById('vid_' + id)) return; 
+        const video = document.createElement('video'); 
+        video.id = 'vid_' + id; 
+        video.srcObject = stream; 
+        video.autoplay = true; 
+        if(id.includes('local')) video.muted = true; 
+        
+        video.style.cursor = 'pointer';
+        video.title = "Double-click for Fullscreen";
+        video.addEventListener('dblclick', () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else if (video.requestFullscreen) {
+                video.requestFullscreen();
+            } else if (video.webkitRequestFullscreen) { /* Safari */
+                video.webkitRequestFullscreen();
+            }
+        });
+
+        document.getElementById('media-container').appendChild(video); 
+    }
 
     // --- UTILS ---
     chatBox.addEventListener('scroll', () => { if ((chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight) < 80) scrollAlert.style.display = 'none'; });
